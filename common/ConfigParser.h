@@ -21,8 +21,8 @@ namespace surfelwarp {
 		/* The path information
 		 */
 	private:
-		std::string m_data_prefix;
-		std::string m_gpc_model_path;
+		std::string m_data_prefix;  // 数据的路径
+		std::string m_gpc_model_path;  // gpc是一种光流方法，这里要考虑这个有用吗，我记得论文中并没有用到这个模型，但是暂时先考虑留着吧
 		void setDefaultPathConfig();
 		void savePathConfigToJson(void* json_ptr) const;
 		void loadPathConfigFromJson(const void* json_ptr);
@@ -33,8 +33,8 @@ namespace surfelwarp {
 		/* The frame index
 		 */
 	private:
-		int m_start_frame_idx;
-		int m_num_frames;
+		int m_start_frame_idx;  // 开始帧序号
+		int m_num_frames;  // 总共有多少帧的数据需要处理
 		void setDefaultFrameIndex();
 		void saveFrameIndexToJson(void* json_ptr) const;
 		void loadFrameIndexFromJson(const void* json_ptr);
@@ -45,8 +45,8 @@ namespace surfelwarp {
 		
 		//The frame peroids for reinit and recent
 	private:
-		bool m_use_periodic_reinit;
-		int m_reinit_period;
+		bool m_use_periodic_reinit;  // 是否使用周期初始化
+		int m_reinit_period;  // 重新初始化的周期是多少
 		void setDefaultPeroidsValue();
 		void savePeroidsValueToJson(void* json_ptr) const;
 		void loadPeroidsValueFromJson(const void* json_ptr);

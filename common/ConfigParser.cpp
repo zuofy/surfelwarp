@@ -7,6 +7,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+// 构造函数，为该类设置默认参数
 surfelwarp::ConfigParser::ConfigParser() {
 	setDefaultParameters();
 }
@@ -64,6 +65,7 @@ void surfelwarp::ConfigParser::SaveConfig(const std::string & config_path) const
 
 
 //Access interface
+// zuofy 设置一个接口返回一个实例，调用该接口的好处是，实例模式仅有一个结果，全局统一配置
 surfelwarp::ConfigParser & surfelwarp::ConfigParser::Instance() {
 	static ConfigParser parser;
 	return parser;
@@ -71,6 +73,7 @@ surfelwarp::ConfigParser & surfelwarp::ConfigParser::Instance() {
 
 /* The query about the path
  */
+// 设置数据和gpc模型的路径，默认配置
 void surfelwarp::ConfigParser::setDefaultPathConfig() {
 	//File Options
 #if defined(_WIN32)
@@ -122,6 +125,7 @@ const boost::filesystem::path surfelwarp::ConfigParser::gpc_model_path() const {
 
 
 //The query about frame
+// zuofy 这里用来设置当前要处理的帧，以及最多有多少帧
 void surfelwarp::ConfigParser::setDefaultFrameIndex() {
 	m_start_frame_idx = 0;
 	m_num_frames = 100;
@@ -164,6 +168,7 @@ int surfelwarp::ConfigParser::num_frames() const {
 
 
 //The method about peroids
+// 周期初始化操作的相关内容
 void surfelwarp::ConfigParser::setDefaultPeroidsValue() {
 	m_use_periodic_reinit = false;
 	m_reinit_period = -1;  // By default, no periodic

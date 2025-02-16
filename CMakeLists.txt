@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)  # 要求cmake版本最小为3.2
 
-project(surfelwarp)
+project(surfelwarp)  # 定义项目名称
 
 # Add cmake module path
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)  # 指定了自定义的CMake模块的路径
 
 # Language options
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)  # 指定c++11标准
+set(CMAKE_CXX_STANDARD_REQUIRED ON) 
 
 # Cuda
 find_package(CUDA 9 REQUIRED)
