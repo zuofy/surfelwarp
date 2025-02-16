@@ -11,7 +11,7 @@
 //Clip pixels at boundary for better windowed search. 
 //Please refer to clip.md under imgproc directory for details
 #ifndef boundary_clip
-#define boundary_clip 20
+#define boundary_clip 20  // 设置一个边界范围，该范围不进行渲染吧，边界不处理
 #endif
 
 

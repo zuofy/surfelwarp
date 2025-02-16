@@ -204,6 +204,7 @@ void surfelwarp::ConfigParser::loadPeroidsValueFromJson(const void *json_ptr) {
 
 /* The image size methods
  */
+// 设置图像大小包括（原始图像大小和裁剪后图像大小）
 void surfelwarp::ConfigParser::setDefaultImageSize() {
 	m_raw_image_rows = 480;
 	m_raw_image_cols = 640;
@@ -240,6 +241,7 @@ void surfelwarp::ConfigParser::loadImageSizeFromJson(const void *json_ptr) {
 
 /* The method for clip size
  */
+// 设置一下裁剪的最近距离和最远距离，默认是1厘米和1米
 void surfelwarp::ConfigParser::setDefaultClipValue() {
 	m_clip_near = 10;
 	m_clip_far = 1000;

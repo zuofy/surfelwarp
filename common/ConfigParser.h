@@ -58,10 +58,10 @@ namespace surfelwarp {
 		/* The method and member about the size of image
 		 */
 	private:
-		unsigned m_raw_image_rows;
-		unsigned m_raw_image_cols;
-		unsigned m_clip_image_rows;
-		unsigned m_clip_image_cols;
+		unsigned m_raw_image_rows;  // 原始图像宽/行
+		unsigned m_raw_image_cols;  // 原始图像高/列
+		unsigned m_clip_image_rows;  // 裁剪后图像宽/行
+		unsigned m_clip_image_cols;  // 裁剪后图像高/列
 		void setDefaultImageSize();
 		void saveImageSizeToJson(void* json_ptr) const;
 		void loadImageSizeFromJson(const void* json_ptr);
@@ -75,8 +75,8 @@ namespace surfelwarp {
 		/* The method and member about cliping
 		 */
 	private:
-		unsigned m_clip_near;
-		unsigned m_clip_far;
+		unsigned m_clip_near; // 裁剪的一个距离范围，最近平面
+		unsigned m_clip_far;  // 裁剪的一个距离范围，最远距离
 		void setDefaultClipValue();
 		void saveClipValueToJson(void* json_ptr) const;
 		void loadClipValueFromJson(const void* json_ptr);
