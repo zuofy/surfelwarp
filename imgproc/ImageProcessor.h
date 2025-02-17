@@ -43,15 +43,15 @@ namespace surfelwarp {
 		*/
     private:
         //Size and intrinsic of the camera
-        unsigned m_raw_img_cols, m_raw_img_rows;
-		unsigned m_clip_img_cols, m_clip_img_rows;
-		unsigned m_clip_near, m_clip_far;
+        unsigned m_raw_img_cols, m_raw_img_rows;  // 原始宽高
+		unsigned m_clip_img_cols, m_clip_img_rows;  // 裁剪后的宽高
+		unsigned m_clip_near, m_clip_far;  // 裁剪后的前后距离，这个距离应该可以作为近平面和远平面
 
 		//The intrinsic parameters
-		Intrinsic m_raw_depth_intrinsic;
-		Intrinsic m_raw_rgb_intrinsic;
-		Intrinsic m_clip_rgb_intrinsic;
-		mat34 m_depth2rgb;
+		Intrinsic m_raw_depth_intrinsic;  // 深度传感器内参
+		Intrinsic m_raw_rgb_intrinsic;  // 相机内参
+		Intrinsic m_clip_rgb_intrinsic;  // 裁剪后的图像对应的内参
+		mat34 m_depth2rgb;  // 这是一个旋转平移矩阵3*4矩阵，这个矩阵目前是单位矩阵，作用推测可能有两种：1.相机和深度传感器没有对齐；2.外参
 	public:
 		unsigned clip_rows() const { return m_clip_img_rows; }
 		unsigned clip_cols() const { return m_clip_img_cols; }
@@ -63,13 +63,13 @@ namespace surfelwarp {
 		*/
     private:
         //The image fetcher from the constructor
-        FetchInterface::Ptr m_image_fetcher;
+        FetchInterface::Ptr m_image_fetcher;  // 用于获取图像，这是一个类
 
         //The opencv matrix and the underline memory for image fetching
-        cv::Mat m_depth_img, m_rgb_img, m_rgb_img_prev;
-        void* m_depth_buffer_pagelock;
-        void* m_rgb_buffer_pagelock;
-		void* m_rgb_prev_buffer_pagelock;
+        cv::Mat m_depth_img, m_rgb_img, m_rgb_img_prev;  // opencv矩阵，分别放置深度图，rgb图像和前一帧的rgb图像，用于数据加载
+        void* m_depth_buffer_pagelock;  // 在cuda的固定区域，用于放置深度图像
+        void* m_rgb_buffer_pagelock;  // 在cuda的固定区域，用于放置rgb图像
+		void* m_rgb_prev_buffer_pagelock;  // 在cuda的固定区域，用于放置前一帧的rgb图像
 
         //Init the buffer for image fetch
         void allocateFetchBuffer();
@@ -92,15 +92,15 @@ namespace surfelwarp {
 	private:
 		//The texture for raw image and the underlying array
 		//In the original size (not the cliped size)
-		CudaTextureSurface m_depth_raw_collect;
+		CudaTextureSurface m_depth_raw_collect;  // 虽然没太看明白，但是应该还是存储的深度数据，只是通过cuda方式进行处理
 
 		//The Reproject depth image to color frame
 		//Using a scale factor to avoid collision
-		DeviceArray2D<unsigned short> m_reprojected_buffer;
+		DeviceArray2D<unsigned short> m_reprojected_buffer;  // 用于存储投影后的深度数据，放大了两倍，防止发生碰撞
 
 		//The texture, surface and array for filter depth image
 		//In the cliped size
-		CudaTextureSurface m_depth_filter_collect;
+		CudaTextureSurface m_depth_filter_collect; // 虽然没太看明白，但是应该还是存储的深度数据，裁剪过后的，只是通过cuda方式进行处理
 
 		//Init the buffer for depth texture
 		void allocateDepthTexture();
@@ -122,16 +122,16 @@ namespace surfelwarp {
 		*/
 	private:
 		//The flatten buffer for rgb image
-		DeviceArray<uchar3> m_raw_rgb_buffer;
-		DeviceArray<uchar3> m_raw_rbg_buffer_prev;
+		DeviceArray<uchar3> m_raw_rgb_buffer;  // 创建一个数组，存储rgb图像
+		DeviceArray<uchar3> m_raw_rbg_buffer_prev;  // 创建一个数组，存储前一帧的rgb图像
 
 		//The clipped and normalized rgb image, float4
-		CudaTextureSurface m_clip_normalize_rgb_collect;
-		CudaTextureSurface m_clip_normalize_rgb_collect_prev;
+		CudaTextureSurface m_clip_normalize_rgb_collect;  // 创建一个数组，存储裁剪后的图像 cuda相关
+		CudaTextureSurface m_clip_normalize_rgb_collect_prev;  // 创建一个数组，存储前一帧的裁剪后的图像 cuda相关
 
 		//The density map for rgb and rgb_prev, float1
-		CudaTextureSurface m_density_map_collect;
-		CudaTextureSurface m_filter_density_map_collect;
+		CudaTextureSurface m_density_map_collect;  // 这个是密度相关的图，通过cuda来搞的，据说有加速效果
+		CudaTextureSurface m_filter_density_map_collect;  // 这个是密度相关的图，通过cuda来搞的，据说有加速效果
 		
 		//Init and destroy the buffer
 		void allocateRGBBuffer();
@@ -150,10 +150,10 @@ namespace surfelwarp {
 		*/
 	private:
 		//float4 texture, (x, y, z) is vertex, w is the confidence value
-		CudaTextureSurface m_vertex_confid_collect;
+		CudaTextureSurface m_vertex_confid_collect;  // 顶点、置信度
 
 		//float4 texture, (x, y, z) is normal, w is the radius
-		CudaTextureSurface m_normal_radius_collect;
+		CudaTextureSurface m_normal_radius_collect;  // 法线、半径
 
 		//Create the destroy texture collect above
 		void allocateGeometryTexture();
@@ -170,7 +170,7 @@ namespace surfelwarp {
         *        Shoule be the same format as the surfel array
 		*/
     private:
-        CudaTextureSurface m_color_time_collect;
+        CudaTextureSurface m_color_time_collect;  // color time指的是这个颜色是什么时候获取的吧？
         void allocateColorTimeTexture();
         void releaseColorTimeTexture();
     public:

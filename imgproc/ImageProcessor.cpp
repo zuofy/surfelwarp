@@ -162,6 +162,7 @@ void surfelwarp::ImageProcessor::allocateFetchBuffer()
 {
 	//First allocate the buffer
 	const auto raw_img_size = m_raw_img_rows * m_raw_img_cols;
+	// cudaMallocHost可以分配一块固定的内存
 	cudaSafeCall(cudaMallocHost(&m_depth_buffer_pagelock, sizeof(unsigned short) * raw_img_size));
 	cudaSafeCall(cudaMallocHost(&m_rgb_buffer_pagelock, sizeof(uchar4) * raw_img_size));
 	cudaSafeCall(cudaMallocHost(&m_rgb_prev_buffer_pagelock, sizeof(uchar4) * raw_img_size));

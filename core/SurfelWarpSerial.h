@@ -25,7 +25,8 @@
 #include <boost/filesystem.hpp>
 
 namespace surfelwarp {
-	
+	// 这个类就牛批了，这个类是总的处理的类，所有的代码都是从这里开始处理的
+	// 整个算法的核心，来吧，啃硬骨头了
 	class SurfelWarpSerial {
 	private:
 		//The primary components
@@ -64,7 +65,7 @@ namespace surfelwarp {
 		
 	public:
 		using Ptr = std::shared_ptr<SurfelWarpSerial>;
-		SurfelWarpSerial();
+		SurfelWarpSerial();  // 先啃最硬的骨头，构造函数
 		~SurfelWarpSerial();
 		SURFELWARP_NO_COPY_ASSIGN_MOVE(SurfelWarpSerial);
 		

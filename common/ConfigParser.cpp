@@ -24,6 +24,7 @@ void surfelwarp::ConfigParser::setDefaultParameters() {
 
 /* Public interface
  */
+// 从配置文件中加载数据
 void surfelwarp::ConfigParser::ParseConfig(const std::string & config_path) {
 	using json = nlohmann::json;
 
@@ -271,7 +272,7 @@ void surfelwarp::ConfigParser::loadClipValueFromJson(const void *json_ptr) {
 
 /* The method and buffer for querying the intrinsic
  */
-
+// 设置深度相机，彩色相机，裁剪后的彩色图像对应的内参
 void surfelwarp::ConfigParser::setDefaultCameraIntrinsic() {
 	const float focal_x = 570.f;
 	const float focal_y = 570.f;
@@ -353,6 +354,7 @@ surfelwarp::mat34 surfelwarp::ConfigParser::depth2rgb_dev() const
 }
 
 //The method about penalty terms
+// 看注释这里是一些惩罚项目，是否使用前景，是否使用密度控制，是否使用离线前景
 void surfelwarp::ConfigParser::setDefaultPenaltyConfigs() {
 	m_use_foreground_term = false;
 	m_use_density_term = false;

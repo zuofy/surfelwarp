@@ -14,12 +14,13 @@
 #include <thread>
 #include <fstream>
 
+// 构造函数
 surfelwarp::SurfelWarpSerial::SurfelWarpSerial() {
 	//The config is assumed to be updated
 	const auto& config = ConfigParser::Instance();
 	
 	//Construct the image processor
-	FetchInterface::Ptr fetcher = std::make_shared<GenericFileFetch>(config.data_path());
+	FetchInterface::Ptr fetcher = std::make_shared<GenericFileFetch>(config.data_path());  // 有点意思，这个应该是用来读取图像的，获取所有图像的路径和数据
 	m_image_processor = std::make_shared<ImageProcessor>(fetcher);
 	
 	//Construct the holder for surfel geometry

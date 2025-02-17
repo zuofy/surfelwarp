@@ -31,11 +31,13 @@ namespace fs = boost::filesystem;
 surfelwarp::GenericFileFetch::GenericFileFetch(const fs::path& data_path, std::string extension, bool force_no_masks) :
 		m_mask_buffer_ix(SIZE_MAX), m_use_masks(false)
 {
-	std::vector<path> sorted_paths;
+	std::vector<path> sorted_paths; //用于存储目录中所有的文件路径
 	if (extension.length() > 0 && extension[0] != '.') {
 		extension = "." + extension;
 	}
+	// 使用 fs::directory_iterator 来遍历 data_path 路径下的所有文件，并将文件路径存储到 sorted_paths 向量中。
 	std::copy(fs::directory_iterator(data_path), fs::directory_iterator(), std::back_inserter(sorted_paths));
+	// 然后，使用 std::sort 对文件路径进行排序，确保文件按字母顺序排列。
 	std::sort(sorted_paths.begin(), sorted_paths.end());
 	bool unexpected_mask_frame_number = false;
 	for (auto& path : sorted_paths) {

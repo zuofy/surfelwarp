@@ -25,7 +25,7 @@ namespace surfelwarp {
 		std::string m_gpc_model_path;  // gpc是一种光流方法，这里要考虑这个有用吗，我记得论文中并没有用到这个模型，但是暂时先考虑留着吧
 		void setDefaultPathConfig();
 		void savePathConfigToJson(void* json_ptr) const;
-		void loadPathConfigFromJson(const void* json_ptr);
+		void loadPathConfigFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		const boost::filesystem::path data_path() const;
 		const boost::filesystem::path gpc_model_path() const;
@@ -37,7 +37,7 @@ namespace surfelwarp {
 		int m_num_frames;  // 总共有多少帧的数据需要处理
 		void setDefaultFrameIndex();
 		void saveFrameIndexToJson(void* json_ptr) const;
-		void loadFrameIndexFromJson(const void* json_ptr);
+		void loadFrameIndexFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		int start_frame_idx() const;
 		int num_frames() const;
@@ -49,7 +49,7 @@ namespace surfelwarp {
 		int m_reinit_period;  // 重新初始化的周期是多少
 		void setDefaultPeroidsValue();
 		void savePeroidsValueToJson(void* json_ptr) const;
-		void loadPeroidsValueFromJson(const void* json_ptr);
+		void loadPeroidsValueFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		bool use_periodic_reinit() const { return m_use_periodic_reinit; }
 		int reinit_period() const { return m_reinit_period; }
@@ -64,7 +64,7 @@ namespace surfelwarp {
 		unsigned m_clip_image_cols;  // 裁剪后图像高/列
 		void setDefaultImageSize();
 		void saveImageSizeToJson(void* json_ptr) const;
-		void loadImageSizeFromJson(const void* json_ptr);
+		void loadImageSizeFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		unsigned raw_image_rows() const { return m_raw_image_rows; }
 		unsigned raw_image_cols() const { return m_raw_image_cols; }
@@ -79,7 +79,7 @@ namespace surfelwarp {
 		unsigned m_clip_far;  // 裁剪的一个距离范围，最远距离
 		void setDefaultClipValue();
 		void saveClipValueToJson(void* json_ptr) const;
-		void loadClipValueFromJson(const void* json_ptr);
+		void loadClipValueFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		unsigned clip_near_mm() const { return m_clip_near; }
 		unsigned clip_far_mm() const { return m_clip_far; }
@@ -93,12 +93,12 @@ namespace surfelwarp {
 		/* The method for intrinsic querying
 		 */
 	private:
-		Intrinsic raw_depth_intrinsic;
-		Intrinsic raw_rgb_intrinsic;
-		Intrinsic clip_rgb_intrinsic;
+		Intrinsic raw_depth_intrinsic;  // 原始的深度相机的内参
+		Intrinsic raw_rgb_intrinsic;  // 原始的彩色相机的内参（默认和上边是一样的）
+		Intrinsic clip_rgb_intrinsic;  // 裁剪后的彩色相机内参（边界裁剪）
 		void setDefaultCameraIntrinsic();
 		void saveCameraIntrinsicToJson(void* json_ptr) const;
-		void loadCameraIntrinsicFromJson(const void* json_ptr);
+		void loadCameraIntrinsicFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		Intrinsic depth_intrinsic_raw() const;
 		Intrinsic rgb_intrinsic_raw() const;
@@ -107,13 +107,14 @@ namespace surfelwarp {
 
 		
 		//A various of configs for penalty constants
+		// 从注释中理解这里是一些惩罚项，但是具体理解仍需看代码
 	private:
-		bool m_use_density_term;
-		bool m_use_foreground_term;
-		bool m_use_offline_foreground;
+		bool m_use_density_term;  // 是否使用密度项（需要代码中理解）
+		bool m_use_foreground_term;  // 是否使用前景项目 （需要代码中理解）
+		bool m_use_offline_foreground;  // 是否使用离线前景 （代码中理解）
 		void setDefaultPenaltyConfigs();
 		void savePenaltyConfigToJson(void* json_ptr) const;
-		void loadPenaltyConfigFromJson(const void* json_ptr);
+		void loadPenaltyConfigFromJson(const void* json_ptr);  // 从json中加载数据
 	public:
 		bool use_foreground_term() const;
 		bool use_offline_foreground_segmneter() const;

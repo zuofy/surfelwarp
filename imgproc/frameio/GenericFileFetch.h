@@ -50,19 +50,19 @@ namespace surfelwarp
 		void FetchRGBImage(size_t frame_idx, void* rgb_img) override;
 
 	private:
-		static int GetFrameNumber(const path& filename);
-		static bool HasSubstringFromSet(const std::string& string, const std::string* set, int set_size);
-		static bool FilenameIndicatesDepthImage(const path& filename, const std::string& valid_extension);
-		static bool FilenameIndicatesRGBImage(const path& filename, const std::string& valid_extension);
-		static bool FilenameIndicatesMaskImage(const path& filename, const std::string& valid_extension);
+		static int GetFrameNumber(const path& filename);  // 获取帧号
+		static bool HasSubstringFromSet(const std::string& string, const std::string* set, int set_size);  // 用于判断字符串中是否包含某个字符
+		static bool FilenameIndicatesDepthImage(const path& filename, const std::string& valid_extension);  // 判断是否是深度图像
+		static bool FilenameIndicatesRGBImage(const path& filename, const std::string& valid_extension);  // 判断是否是rgb图像
+		static bool FilenameIndicatesMaskImage(const path& filename, const std::string& valid_extension);  // 判断是否是掩码图像
 
-		std::vector<path> m_rgb_image_paths;
-		std::vector<path> m_depth_image_paths;
-		std::vector<path> m_mask_image_paths;
+		std::vector<path> m_rgb_image_paths;  //存储所有的rgb图像路径
+		std::vector<path> m_depth_image_paths;  // 存储所有深度图像的路径
+		std::vector<path> m_mask_image_paths;  // 存储所有掩码图像的路径
 
-		size_t m_mask_buffer_ix;
-		cv::Mat m_mask_image_buffer;
-		bool m_use_masks;
+		size_t m_mask_buffer_ix;  // 缓冲区大小
+		cv::Mat m_mask_image_buffer;  
+		bool m_use_masks;  // 是否使用掩码
 		std::mutex mask_mutex;
 	};
 } // end namespace surfelwarp
