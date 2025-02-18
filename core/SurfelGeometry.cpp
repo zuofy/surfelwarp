@@ -1,6 +1,7 @@
 #include "core/SurfelGeometry.h"
 #include "common/Constants.h"
 
+// 构造函数
 surfelwarp::SurfelGeometry::SurfelGeometry() : m_num_valid_surfels(0)
 {
 	//Allocate owned buffer

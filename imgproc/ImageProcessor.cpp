@@ -86,9 +86,9 @@ surfelwarp::DeviceArrayView<surfelwarp::DepthSurfel> surfelwarp::ImageProcessor:
 	ClipNormalizeRGBImage(stream);
 	
 	//The geometry map
-	BuildVertexConfigMap(stream);
-	BuildNormalRadiusMap(stream);
-	BuildColorTimeTexture(frame_idx, stream);
+	BuildVertexConfigMap(stream);  // 初始化了顶点和置信度的信息，但是置信度初始化为1，应该是信息还没处理完吧
+	BuildNormalRadiusMap(stream);  // 初始化法线和半径
+	BuildColorTimeTexture(frame_idx, stream);  // 初始化颜色和时间（颜色、0，时间，时间）
 	
 	//Collect it
 	CollectValidDepthSurfel(stream);
@@ -105,15 +105,15 @@ void surfelwarp::ImageProcessor::ProcessFrameSerial(
 	size_t frame_idx, 
 	cudaStream_t stream
 ) {
-	FetchFrame(frame_idx);
-	UploadDepthImage(stream);
-	UploadRawRGBImage(stream);
+	FetchFrame(frame_idx);  // 加载图像
+	UploadDepthImage(stream);  // 将深度图转移到cuda上
+	UploadRawRGBImage(stream);  // 将rgb图像转移到粗大上
 
 	//This seems cause some problem ,disable it at first
 	//ReprojectDepthToRGB(stream);
 	
-	ClipFilterDepthImage(stream);
-	ClipNormalizeRGBImage(stream);
+	ClipFilterDepthImage(stream);  // 滤波是干啥的，滤波就是将一个范围内的深度图用个高斯核卷积一下，感觉能够平滑一下点云
+	ClipNormalizeRGBImage(stream);  // 归一化RGB图像，滤波灰度图像和前一帧的归一化RGB图像
 
 	//The geometry map
 	BuildVertexConfigMap(stream);
@@ -186,11 +186,12 @@ void surfelwarp::ImageProcessor::releaseFetchBuffer()
 
 void surfelwarp::ImageProcessor::FetchFrame(size_t frame_idx)
 {
-	FetchDepthImage(frame_idx);
-	FetchRGBImage(frame_idx);
-	FetchRGBPrevFrame(frame_idx);
+	FetchDepthImage(frame_idx);  // 将图像加载到cuda里
+	FetchRGBImage(frame_idx);  // 将图像加载到cuda里
+	FetchRGBPrevFrame(frame_idx);  // 将上一帧的rgb图像加载到cuda里
 }
 
+// 加载某一帧的深度图像
 void surfelwarp::ImageProcessor::FetchDepthImage(size_t frame_idx)
 {
 	m_image_fetcher->FetchDepthImage(frame_idx, m_depth_img);
@@ -200,6 +201,7 @@ void surfelwarp::ImageProcessor::FetchDepthImage(size_t frame_idx)
 	);
 }
 
+// 加载某一帧的rgb图像
 void surfelwarp::ImageProcessor::FetchRGBImage(size_t frame_idx)
 {
 	m_image_fetcher->FetchRGBImage(frame_idx, m_rgb_img);
@@ -208,6 +210,7 @@ void surfelwarp::ImageProcessor::FetchRGBImage(size_t frame_idx)
 	);
 }
 
+// 加载某一帧的rgb图像
 void surfelwarp::ImageProcessor::FetchRGBPrevFrame(size_t curr_frame_idx)
 {
 	//First compute the frame idx
@@ -256,6 +259,7 @@ void surfelwarp::ImageProcessor::releaseDepthTexture()
 	releaseTextureCollect(m_depth_filter_collect);
 }
 
+// 通过新加载的数据对m_depth_raw_collect的数组进行赋值
 void surfelwarp::ImageProcessor::UploadDepthImage(cudaStream_t stream)
 {
 	cudaSafeCall(cudaMemcpyToArrayAsync(
@@ -267,6 +271,7 @@ void surfelwarp::ImageProcessor::UploadDepthImage(cudaStream_t stream)
 		stream
 	));
 }
+
 
 void surfelwarp::ImageProcessor::ReprojectDepthToRGB(cudaStream_t stream)
 {
@@ -340,6 +345,8 @@ void surfelwarp::ImageProcessor::releaseRGBBuffer()
 	releaseTextureCollect(m_filter_density_map_collect);
 }
 
+
+// 猜测pagelock很方便进行内存和显存的交互，所以这里其实是从内存向显存同步数据
 void surfelwarp::ImageProcessor::UploadRawRGBImage(cudaStream_t stream)
 {
 	void* ptr = m_raw_rgb_buffer.ptr();
@@ -377,7 +384,7 @@ void surfelwarp::ImageProcessor::ClipNormalizeRGBImage(cudaStream_t stream)
 		m_clip_img_rows, m_clip_img_cols,
 		stream
 	);
-
+    // 前一帧只做归一化，不对灰度图进行处理
 	clipNormalizeRGBImage(
 		m_raw_rbg_buffer_prev, 
 		m_clip_img_rows, m_clip_img_cols,
@@ -483,6 +490,7 @@ void surfelwarp::ImageProcessor::CollectValidDepthSurfel(cudaStream_t stream)
 	);
 	
 	//First mark the validity of depth surfels
+	// 这里的操作是深度值大于0就有效
 	markValidDepthPixel(
 		m_depth_filter_collect.texture,
 		m_clip_img_rows, m_clip_img_cols,
@@ -491,13 +499,16 @@ void surfelwarp::ImageProcessor::CollectValidDepthSurfel(cudaStream_t stream)
 	);
 	
 	//Do selection
+	// 选取有效的坐标的索引
 	m_valid_depth_pixel_selector.Select(valid_indicator, stream);
 	
 	//Construct the output
+	// 有效的点
 	const auto selected_surfel_size = m_valid_depth_pixel_selector.valid_selected_idx.size();
 	m_depth_surfel.ResizeArrayOrException(selected_surfel_size);
 	
 	//Collect it
+	// 初始化surfel
 	DeviceArray<DepthSurfel> valid_surfel_array = m_depth_surfel.Array();
 	collectDepthSurfel(
 		m_vertex_confid_collect.texture,

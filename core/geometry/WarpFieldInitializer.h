@@ -35,7 +35,7 @@ namespace surfelwarp {
 		 * Of course, this operation requires sync
 		 */
 	private:
-		VoxelSubsampler::Ptr m_vertex_subsampler;
+		VoxelSubsampler::Ptr m_vertex_subsampler;  // 这里用了体素下采样，具体怎么操作还要再关注关注
 		SynchronizeArray<float4> m_node_candidate;
 		void performVertexSubsamplingSync(const DeviceArrayView<float4>& reference_vertex, cudaStream_t stream = 0);
 	};

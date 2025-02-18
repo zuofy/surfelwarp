@@ -31,7 +31,7 @@ namespace surfelwarp {
 		unsigned short m_num_nodes;
 		
 		//The buffer to clear the node coordinates
-		DeviceArray<float4> m_invalid_nodes;
+		DeviceArray<float4> m_invalid_nodes;  // 暂时还不知道是做什么用的，先不管了，继续往下看，想吐，代码太多了
 		void clearConstantPoints(cudaStream_t stream = 0);
 		
 		//Switch the index from one set of nodes to another

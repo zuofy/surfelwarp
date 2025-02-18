@@ -18,15 +18,17 @@ namespace surfelwarp {
 	 * Its task is to update the LIVE geometry and knn for both existing
 	 * and newly appended surfels. The double buffer approach is implemented here
 	 */
+	// 这个任务用来更新live的几何和knn对于已经存在的和新添加的surfel
 	class LiveGeometryUpdater {
 	private:
-		SurfelGeometry::Ptr m_surfel_geometry[2];
+		SurfelGeometry::Ptr m_surfel_geometry[2];  // 这个其实就是m_surfel_geometry里的两个东西，指向的应该是同一块内存区域，现在还搞不明白为什么用两个
 		//For any processing iteration, this variable should be constant, only assign by external variable
-		int m_updated_idx;
-		float m_current_time;
+		// 在任何处理过程中，该值只能由外部复制，不应该被改变
+		int m_updated_idx;  // 暂时还不知道是什么意思，但是应该是说是第几帧
+		float m_current_time;  // 这个值应该是当前处理的是第几帧
 		
 		//The map from the renderer
-		Renderer::FusionMaps m_fusion_maps;
+		Renderer::FusionMaps m_fusion_maps;  // 变形后需要融合的点
 		
 		//The skinning method from updater
 		WarpField::LiveGeometryUpdaterInput m_warpfield_input;
@@ -58,7 +60,7 @@ namespace surfelwarp {
 		/* The buffer and method for surfel fusion
 		 */
 	private:
-		SurfelFusionHandler::Ptr m_surfel_fusion_handler;
+		SurfelFusionHandler::Ptr m_surfel_fusion_handler;  // 用来融合live帧的点，这个是个狠人呀，但是暂时还不知具体怎么操作，后续再处理吧，这里先保持这样，里边很多概念暂时还看不明白
 	public:
 		void FuseCameraObservationSync(cudaStream_t stream = 0);
 		
@@ -66,7 +68,7 @@ namespace surfelwarp {
 		/* The buffer and method for cleaning the existing surfels
 		 */
 	private:
-		FusionRemainingSurfelMarker::Ptr m_fusion_remaining_surfel_marker;
+		FusionRemainingSurfelMarker::Ptr m_fusion_remaining_surfel_marker;  // 这个是用来融合已经存在的数据，有些数据已经存在但是需要更新
 	public:
 		void MarkRemainingSurfels(cudaStream_t stream = 0);
 		RemainingLiveSurfelKNN GetRemainingLiveSurfelKNN() const;
@@ -75,7 +77,7 @@ namespace surfelwarp {
 		/* The buffer and method to process appended surfels
 		 */
 	private:
-		AppendSurfelProcessor::Ptr m_appended_surfel_processor;
+		AppendSurfelProcessor::Ptr m_appended_surfel_processor;  // 没太理解，但是估计也是做数据处理的，用来对需要添加surfle
 	public:
 		void ProcessAppendedSurfels(cudaStream_t stream = 0);
 
@@ -83,7 +85,7 @@ namespace surfelwarp {
 		/* Compact the remaining surfel and appended surfel to another buffer
 		 */
 	private:
-		DoubleBufferCompactor::Ptr m_surfel_compactor;
+		DoubleBufferCompactor::Ptr m_surfel_compactor; // 这个按照我的理解是将处理的数据存储再另外一个buffer里
 	public:
 		void CompactSurfelToAnotherBufferSync(unsigned& num_remaining_surfel, unsigned& num_appended_surfel, cudaStream_t stream = 0);
 		void TestCompactionKNNFirstIter(unsigned num_remaining_surfel, unsigned num_appended_surfel);

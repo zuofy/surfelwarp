@@ -22,21 +22,21 @@ namespace surfelwarp {
 	private:
 		//The underlying struct for the surfel model
 		//Read-Write access, but not owned
-		DeviceSliceBufferArray<float4> m_reference_vertex_confid;
-		DeviceSliceBufferArray<float4> m_reference_normal_radius;
-		DeviceSliceBufferArray<float4> m_live_vertex_confid;
-		DeviceSliceBufferArray<float4> m_live_normal_radius;
-		DeviceSliceBufferArray<float4> m_color_time;
+		DeviceSliceBufferArray<float4> m_reference_vertex_confid;  // 标准空间的顶点和置信度
+		DeviceSliceBufferArray<float4> m_reference_normal_radius;  // 标准空间的法线和半径
+		DeviceSliceBufferArray<float4> m_live_vertex_confid;  // 活动帧的顶点和置信度
+		DeviceSliceBufferArray<float4> m_live_normal_radius;  // 活动帧的法线和半径
+		DeviceSliceBufferArray<float4> m_color_time;  // 颜色和时间
 		friend struct GLSurfelGeometryVBO; //map from graphic pipelines
 		friend class SurfelNodeDeformer; //deform the vertex/normal given warp field
 		friend class DoubleBufferCompactor; //compact from one buffer to another in double buffer setup
 		
 		//These are owned
-		DeviceBufferArray<ushort4> m_surfel_knn;
-		DeviceBufferArray<float4> m_surfel_knn_weight;
+		DeviceBufferArray<ushort4> m_surfel_knn;  // ？？大胆猜测下，这里存储的是每个点的邻居点
+		DeviceBufferArray<float4> m_surfel_knn_weight;  // ？？大胆猜测下，这里存储的是每个点的邻居点的权重
 		
 		//The size recorded for recovering
-		size_t m_num_valid_surfels;
+		size_t m_num_valid_surfels;  // 有效的surfel数量，初始化为0
 		
 	public:
 		using Ptr = std::shared_ptr<SurfelGeometry>;

@@ -30,29 +30,29 @@ namespace surfelwarp {
 	class SurfelWarpSerial {
 	private:
 		//The primary components
-		ImageProcessor::Ptr m_image_processor;
-		Renderer::Ptr m_renderer;
+		ImageProcessor::Ptr m_image_processor;  // 数据处理的一些东西
+		Renderer::Ptr m_renderer;  // 这个是glfw实现的，用于可视乎渲染数据
 		
 		//The surfel geometry and their updater
-		SurfelGeometry::Ptr m_surfel_geometry[2];
+		SurfelGeometry::Ptr m_surfel_geometry[2];  // 创建了两个surfle，应该是用于cuda编程的时候缓冲区交换的，或者有其他作用，待考虑
 		int m_updated_geometry_index;
 		LiveGeometryUpdater::Ptr m_live_geometry_updater;
 		
 		//The warp field and its updater
-		WarpField::Ptr m_warp_field;
-		WarpFieldInitializer::Ptr m_warpfield_initializer;
-		WarpFieldExtender::Ptr m_warpfield_extender;
+		WarpField::Ptr m_warp_field;  // 用于存储形变场
+		WarpFieldInitializer::Ptr m_warpfield_initializer; // 用于进行形变场的初始化
+		WarpFieldExtender::Ptr m_warpfield_extender;  // 用于新增节点对形变场进行优化
 		
 		//The camera(SE3 transform)
-		Camera m_camera;
+		Camera m_camera;  // 相机的外参
 		
 		//The knn index for live and reference nodes
-		KNNBruteForceLiveNodes::Ptr m_live_nodes_knn_skinner;
-		ReferenceNodeSkinner::Ptr m_reference_knn_skinner;
+		KNNBruteForceLiveNodes::Ptr m_live_nodes_knn_skinner;  // knn绑定
+		ReferenceNodeSkinner::Ptr m_reference_knn_skinner;  // 用于绑定更新和reinitialization更新knn
 		
 		//The warp solver
-		WarpSolver::Ptr m_warp_solver;
-		RigidSolver::Ptr m_rigid_solver;
+		WarpSolver::Ptr m_warp_solver;   // 用于求解非刚性形变的
+		RigidSolver::Ptr m_rigid_solver;  // 用于求解刚性形变的
 		//::WarpSolver::Ptr m_legacy_solver;
 		
 		//The component for geometry processing
@@ -60,8 +60,8 @@ namespace surfelwarp {
 		GeometryReinitProcessor::Ptr m_geometry_reinit_processor;
 		
 		//The frame counter
-		int m_frame_idx;
-		int m_reinit_frame_idx;
+		int m_frame_idx;  // 当前要处理的帧序号
+		int m_reinit_frame_idx;  // 需要重新初始化的帧序号
 		
 	public:
 		using Ptr = std::shared_ptr<SurfelWarpSerial>;

@@ -143,9 +143,9 @@ void surfelwarp::GenericFileFetch::FetchDepthImage(size_t frame_idx, cv::Mat& de
 			m_mask_buffer_ix = frame_idx;
 		}
 		cv::Mat masked;
-		depth_img.copyTo(masked, m_mask_image_buffer);
+		depth_img.copyTo(masked, m_mask_image_buffer);  // 将depth_img中与m_mask_image_buffer中非零值对应的区域复制到masked中
 		mask_mutex.unlock();
-		depth_img = masked;
+		depth_img = masked;  // 这里将mask作用到了深度图像上，深度图像已经处理没有mask之外的区域了
 	}
 }
 

@@ -24,15 +24,15 @@ namespace surfelwarp {
 		unsigned m_image_rows, m_image_cols;
 		
 		//The input from outside
-		Renderer::FusionMaps m_fusion_maps;
-		SurfelGeometry::SurfelFusionInput m_fusion_geometry;
+		Renderer::FusionMaps m_fusion_maps;  // 应该是要融合的点的信息
+		SurfelGeometry::SurfelFusionInput m_fusion_geometry;  // 要融合的几何信息，包含更加全面的数据，甚至包含knn的信息
 		CameraObservation m_observation;
 		float m_current_time;
 		mat34 m_world2camera;
 		bool m_use_atomic_append; //Use atomic append or not
 		
 		//The buffer maintained by this class
-		DeviceBufferArray<unsigned> m_remaining_surfel_indicator;
+		DeviceBufferArray<unsigned> m_remaining_surfel_indicator;  // 用来保存surfel的指示器，具体干啥还不知道，应该存储了一些点，暂时保留吧
 		
 	public:
 		using Ptr = std::shared_ptr<SurfelFusionHandler>;
@@ -68,9 +68,9 @@ namespace surfelwarp {
 		/* Process data fusion using compaction
 		 */
 	private:
-		DeviceArray<unsigned> m_appended_depth_surfel_indicator; //This is fixed in size
-		PrefixSum m_appended_surfel_indicator_prefixsum;
-		DeviceBufferArray<ushort2> m_compacted_appended_pixel;
+		DeviceArray<unsigned> m_appended_depth_surfel_indicator; //This is fixed in size 要添加数据的指示器
+		PrefixSum m_appended_surfel_indicator_prefixsum; // 用于处理前缀和，多看看，这里能不能参考3dgs修改
+		DeviceBufferArray<ushort2> m_compacted_appended_pixel;  // 要添加的像素坐标？？
 		void prepareFuserArguments(void* fuser_ptr);
 		void processFusionAppendCompaction(cudaStream_t stream = 0);
 		void processFusionReinit(cudaStream_t stream = 0);
@@ -84,7 +84,7 @@ namespace surfelwarp {
 		/* Process appedning using atomic operation
 		 */
 	private:
-		unsigned* m_atomic_appended_pixel_index;
+		unsigned* m_atomic_appended_pixel_index; // 原子操作？？
 		DeviceBufferArray<ushort2> m_atomic_appended_observation_pixel;
 		void processFusionAppendAtomic(cudaStream_t stream = 0);
 		void queryAtomicAppendedPixelSize(cudaStream_t stream = 0);

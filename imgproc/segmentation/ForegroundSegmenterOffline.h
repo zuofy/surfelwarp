@@ -18,6 +18,7 @@ namespace surfelwarp {
 	 *        foreground mask from disk, perform suitable
 	 *        upsampling and filtering
 	 */
+	// 通过提供mask实现分割
 	class ForegroundSegmenterOffline : public ForegroundSegmenter {
 	private:
 		//The filename for segment mask

@@ -19,6 +19,8 @@ namespace surfelwarp {
 	 *        and node SE3. The knn/weight, live nodes are resized but no updated.
 	 *        The method assume the node SE3 for existing nodes are ready.
 	 */
+	// 为新添加的点，创建这些形变场数据
+	// 假设已经存在的节点的SE3已经计算好
 	class WarpFieldExtender {
 	public:
 		using Ptr = std::shared_ptr<WarpFieldExtender>;

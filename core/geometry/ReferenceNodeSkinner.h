@@ -17,6 +17,8 @@ namespace surfelwarp {
 	 * and another knn searcher for (re)initialization. When there is no other skinner available,
 	 * the skinning at (re)initialization will also be performed using brute for version
 	 */
+	// 维护一个暴力搜索版本用于绑定更新
+	// 维护另外一个KNN搜索器进行reinitialization
 	class ReferenceNodeSkinner {
 	private:
 		//Do not allow outclass construction

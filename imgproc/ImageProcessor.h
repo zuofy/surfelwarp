@@ -130,8 +130,8 @@ namespace surfelwarp {
 		CudaTextureSurface m_clip_normalize_rgb_collect_prev;  // 创建一个数组，存储前一帧的裁剪后的图像 cuda相关
 
 		//The density map for rgb and rgb_prev, float1
-		CudaTextureSurface m_density_map_collect;  // 这个是密度相关的图，通过cuda来搞的，据说有加速效果
-		CudaTextureSurface m_filter_density_map_collect;  // 这个是密度相关的图，通过cuda来搞的，据说有加速效果
+		CudaTextureSurface m_density_map_collect;  // 密度图他大爷，这就是灰度图像，将rgb转换为了灰度值这个是密度相关的图，通过cuda来搞的，据说有加速效果
+		CudaTextureSurface m_filter_density_map_collect;  // 对灰度图滤波一下，什么鬼，这个是密度相关的图，通过cuda来搞的，据说有加速效果
 		
 		//Init and destroy the buffer
 		void allocateRGBBuffer();
@@ -170,7 +170,8 @@ namespace surfelwarp {
         *        Shoule be the same format as the surfel array
 		*/
     private:
-        CudaTextureSurface m_color_time_collect;  // color time指的是这个颜色是什么时候获取的吧？
+	    // float4，第一位是颜色，第二位是0暂时还不知道是什么，第三位是初始时间，第四位是也用初始时间赋值
+        CudaTextureSurface m_color_time_collect;  // color time指的是颜色和时间，时间就是当前是多少帧，颜色就是点的颜色
         void allocateColorTimeTexture();
         void releaseColorTimeTexture();
     public:
@@ -183,10 +184,10 @@ namespace surfelwarp {
 		*/
 	private:
 		//Pre-allocate memory and array
-		DeviceBufferArray<DepthSurfel> m_depth_surfel;
+		DeviceBufferArray<DepthSurfel> m_depth_surfel;  // 这是一个数组，但是这个数组存储的是surfel的信息，包含相关的surfel属性
 
 		//The selector and collected valid depth surfel
-		FlagSelection m_valid_depth_pixel_selector;
+		FlagSelection m_valid_depth_pixel_selector;  // 这个是选择器，用于选择出有效的深度点，具体怎么选择还要看代码实现
 		
 		void allocateValidSurfelSelectionBuffer();
 		void releaseValidSurfelSelectionBuffer();
@@ -202,7 +203,7 @@ namespace surfelwarp {
 		*/
 	private:
 		//Need to explicit allocate/deallocate
-		ForegroundSegmenter::Ptr m_foreground_segmenter;
+		ForegroundSegmenter::Ptr m_foreground_segmenter;  // 分割器，用于分割出前景目标
 		
 		//Allocator and de-allocator
 		void allocateForegroundSegmentationBuffer();
@@ -219,7 +220,7 @@ namespace surfelwarp {
 		* \brief Sparse feature algorithm. Need foreground mask as input
 		*/
 	private:
-		ImagePairCorrespondence::Ptr m_feature_correspondence_finder;
+		ImagePairCorrespondence::Ptr m_feature_correspondence_finder;  // 其实就是一种光流方法，获取点的对应关系，GPC
 		void allocateFeatureCorrespondenceBuffer();
 		void releaseFeatureCorrespondenceBuffer();
 	public:
@@ -234,9 +235,10 @@ namespace surfelwarp {
 		*        foreground mask. The gradient map are all float2 maps, x and y components
 		*        is the gradient w.r.t x and y axis.
 		*/
+	// 忘记这个密度图和前景mask图的分别代表什么意思了，密度图是不是就是滤波后的图像，前景mask是不是就是加上mask后的图像
 	private:
-		CudaTextureSurface m_foreground_mask_gradient_map_collect;
-		CudaTextureSurface m_density_gradient_map_collect;
+		CudaTextureSurface m_foreground_mask_gradient_map_collect;  // 计算一个梯度，正好可以用在头发丝重建
+		CudaTextureSurface m_density_gradient_map_collect;  // 计算一个梯度，正好能用在头发丝重建
 		void allocateGradientMap();
 		void releaseGradientMap();
 	public:
@@ -248,6 +250,8 @@ namespace surfelwarp {
 		 * \beief Do the image processing in streamed mode. Totally 3 stream is required.
 		 *        The stream is allocated inside the processor during construction.
 		 */
+	// 通过三个流来处理数据，这些流是可以并行处理，有个好处就是可以并行处理不同的任务，加速
+	// 或者是处理前后帧？？？
 	private:
 		cudaStream_t m_processor_stream[3];
 		void initProcessorStream();

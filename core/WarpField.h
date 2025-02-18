@@ -47,7 +47,7 @@ namespace surfelwarp {
 		void releaseBuffer();
 	public:
 		using Ptr = std::shared_ptr<WarpField>;
-		WarpField();
+		WarpField();  // 申请一下内存
 		~WarpField();
 		SURFELWARP_NO_COPY_ASSIGN_MOVE(WarpField);
 		

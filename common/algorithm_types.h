@@ -70,6 +70,8 @@ namespace surfelwarp {
 	/*
 	 * The struct for flag selection
 	 */
+	// 选择器，用于获取具体的mask，
+	// 功能1，获取有效的点
 	struct FlagSelection {
 	private:
 		DeviceArray<int> m_selection_input_buffer;

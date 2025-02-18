@@ -21,6 +21,9 @@ namespace surfelwarp {
 	 * the same as geometry updater, but dont check the attachment and compression of
 	 * appended surfels (accept all).
 	 */
+	// 做几何的重新初始化
+	// 消除不争取的surfel，并且重新设置live/reference几何。
+	// 假设接收所有的surfel
 	class GeometryReinitProcessor {
 	private:
 		//The read-write access to surfel geometry

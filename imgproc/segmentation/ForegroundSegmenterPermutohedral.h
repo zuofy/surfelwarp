@@ -14,7 +14,7 @@
 #include <memory>
 
 namespace surfelwarp {
-	
+	// 一种分割选择器，用于选取前景区域
 	class ForegroundSegmenterPermutohedral : public ForegroundSegmenter {
 	private:
 		//The buffer for mean field probability, float1 texture

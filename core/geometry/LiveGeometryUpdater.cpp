@@ -16,6 +16,12 @@ surfelwarp::LiveGeometryUpdater::LiveGeometryUpdater(surfelwarp::SurfelGeometry:
 	m_updated_idx = 0;
 	
 	//The buffer allocation mehtods
+	// xjb理解一下
+	// 首先获取需要处理的数据：原始数据需要修改的，需要新添加的数据
+	// 然后处理原来的数据
+	// 借助处理需要添加的数据
+	// 最后将两个数据进行融合放到一个buffer中
+	// 这也解释了为什么要有两个buffer，一个用来做数据处理，另外一个用来实时显示，这样处理的效果应该还挺不错的
 	m_surfel_fusion_handler = std::make_shared<SurfelFusionHandler>();
 	m_fusion_remaining_surfel_marker = std::make_shared<FusionRemainingSurfelMarker>();
 	m_appended_surfel_processor = std::make_shared<AppendSurfelProcessor>();

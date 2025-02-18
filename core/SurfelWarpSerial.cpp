@@ -17,23 +17,26 @@
 // 构造函数
 surfelwarp::SurfelWarpSerial::SurfelWarpSerial() {
 	//The config is assumed to be updated
-	const auto& config = ConfigParser::Instance();
+	const auto& config = ConfigParser::Instance();  // 单例模式
 	
 	//Construct the image processor
 	FetchInterface::Ptr fetcher = std::make_shared<GenericFileFetch>(config.data_path());  // 有点意思，这个应该是用来读取图像的，获取所有图像的路径和数据
-	m_image_processor = std::make_shared<ImageProcessor>(fetcher);
+	m_image_processor = std::make_shared<ImageProcessor>(fetcher);  // 图像处理方法
 	
 	//Construct the holder for surfel geometry
+	// 这里是用来处理surfel，包括融合，哪些点需要融合
 	m_surfel_geometry[0] = std::make_shared<SurfelGeometry>();
 	m_surfel_geometry[1] = std::make_shared<SurfelGeometry>();
 	m_live_geometry_updater = std::make_shared<LiveGeometryUpdater>(m_surfel_geometry);
 	
 	//The warp field
+	// 这里是用来解决旋转场的问题
 	m_warp_field = std::make_shared<WarpField>();
 	m_warpfield_initializer = std::make_shared<WarpFieldInitializer>();
 	m_warpfield_extender = std::make_shared<WarpFieldExtender>();
 	
 	//The knn index
+	// 用来做knn聚类，和新加入点的knn
 	m_live_nodes_knn_skinner = KNNBruteForceLiveNodes::Instance();
 	m_reference_knn_skinner = ReferenceNodeSkinner::Instance();
 	
@@ -41,7 +44,7 @@ surfelwarp::SurfelWarpSerial::SurfelWarpSerial() {
 	m_renderer = std::make_shared<Renderer>(config.clip_image_rows(), config.clip_image_cols());
 	
 	//Map the resource into geometry
-	m_renderer->MapSurfelGeometryToCuda(0, *(m_surfel_geometry[0]));
+	m_renderer->MapSurfelGeometryToCuda(0, *(m_surfel_geometry[0]));  // 蜜汁操作，为什么映射到gpu之后又unmap，这里为什么要做一次这个操作呢
 	m_renderer->MapSurfelGeometryToCuda(1, *(m_surfel_geometry[1]));
 	m_renderer->UnmapSurfelGeometryFromCuda(0);
 	m_renderer->UnmapSurfelGeometryFromCuda(1);
@@ -72,6 +75,7 @@ surfelwarp::SurfelWarpSerial::~SurfelWarpSerial() {
  */
 void surfelwarp::SurfelWarpSerial::ProcessFirstFrame() {
 	//Process it
+	// 获取了当前第一帧数据中的有效的surfel
 	const auto surfel_array = m_image_processor->ProcessFirstFrameSerial(m_frame_idx);
 	
 	//Build the reference and live nodes, color and init time

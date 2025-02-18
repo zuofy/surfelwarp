@@ -24,6 +24,7 @@ namespace surfelwarp {
 	 * The task of the compactor is to compact all these surfels to another
 	 * buffer provided by OpenGL pipeline, and count the total number of compacted surfels. 
 	 */
+	// 越看越乱，这里的意思是将两个buffer合并，将原始实时的surfel和补充的depth surfel合并放到另外一个缓冲区里
 	class DoubleBufferCompactor {
 	private:
 		//The appended observation surfel from the depth/color image
