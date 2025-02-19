@@ -36,8 +36,8 @@ namespace surfelwarp {
 		 */
 	private:
 		KNNSearch::Ptr m_init_skinner; //Use for initialization, may need to build index
-		unsigned m_num_bruteforce_nodes; //The number of nodes recorded in the brute force skinning index
-		DeviceArray<float4> m_invalid_nodes;
+		unsigned m_num_bruteforce_nodes; //The number of nodes recorded in the brute force skinning index // 节点的数量
+		DeviceArray<float4> m_invalid_nodes;  // 控制节点，无效的，这里就是用来清空gpu的buffer的？？？
 		
 		//The method to (re)build the skinning index
 		void fillInvalidConstantPoints(cudaStream_t stream = 0);
@@ -45,6 +45,7 @@ namespace surfelwarp {
 			const DeviceArrayView<float4>& nodes,
 			cudaStream_t stream = 0
 		);
+		// 这个方法其实就是把节点同步过来
 		void buildBruteForceIndex(const DeviceArrayView<float4>& nodes, cudaStream_t stream);
 		
 		//The workforce function for initial skinning

@@ -194,6 +194,7 @@ void surfelwarp::WarpFieldUpdater::InitializeReferenceNodesAndSE3FromCandidates(
 		const float4& candidate_point = h_candidate[vert_iter];
 		const float4 point = make_float4(candidate_point.x, candidate_point.y, candidate_point.z, 1.0f);
 		bool is_node = true;
+		// 如果某个点距离某些点的距离小于了某个阈值，则这个点就不适合再作关节点了
 		for(auto node_iter = 0; node_iter < h_nodes.size(); node_iter++) {
 			if(squared_norm_xyz(point - h_nodes[node_iter]) < sample_distance_square) {
 				is_node = false;

@@ -69,6 +69,7 @@ surfelwarp::SurfelGeometry::SurfelFusionInput surfelwarp::SurfelGeometry::Surfel
 	return fusion_input;
 }
 
+// 把当前的节点，surfel，surfel_knn，surfel_weight返回，但是对于第一帧surfel_knn，surfel_weight是没有意义的空数组，只有大小
 surfelwarp::SurfelGeometry::SkinnerInput surfelwarp::SurfelGeometry::SkinnerAccess() {
 	SkinnerInput skinner_input;
 	skinner_input.reference_vertex_confid = m_reference_vertex_confid.ArrayView();

@@ -56,7 +56,7 @@ namespace surfelwarp {
 		//::WarpSolver::Ptr m_legacy_solver;
 		
 		//The component for geometry processing
-		GeometryInitializer::Ptr m_geometry_initializer;
+		GeometryInitializer::Ptr m_geometry_initializer;  // 根据输入的surfel来初始化几何
 		GeometryReinitProcessor::Ptr m_geometry_reinit_processor;
 		
 		//The frame counter

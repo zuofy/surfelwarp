@@ -20,6 +20,9 @@ namespace surfelwarp {
 	 * The reference nodes requires more subsampling, and the SE3 is just identity.
 	 * This operation is used by both the first frame and geometry reinitialization.
 	 */
+	// 仅用于第一帧和几何重新初始化
+	// 目的是对参考帧创建warpfield
+	// 方法是下采样点，然后给每个点初始一个单位矩阵作为SE3
 	class WarpFieldInitializer {
 	public:
 		using Ptr = std::shared_ptr<WarpFieldInitializer>;

@@ -80,10 +80,12 @@ void surfelwarp::NodeGraphBuilderNaive::buildNodeGraph(
 
 
 void surfelwarp::NodeGraphBuilderNaive::BuildNodeGraph(
-	const DeviceArrayView<float4>& reference_nodes, 
+	const DeviceArrayView<float4>& reference_nodes,   // 这个参数表示的是所有的参考帧的节点，要对节点进行处理了呀
 	DeviceBufferArray<ushort2>& node_graph, 
 	cudaStream_t stream
 ) {
+	// 一个节点八个最近的节点
 	node_graph.ResizeArrayOrException(reference_nodes.Size() * Constants::kNumNodeGraphNeigbours);
+	// 计算一个节点最近的八个节点，节点的序号和相邻的距离
 	buildNodeGraph(reference_nodes, node_graph.ArraySlice(), stream);
 }

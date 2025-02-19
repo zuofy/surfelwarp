@@ -311,7 +311,7 @@ void surfelwarp::ReferenceNodeSkinner::replaceWithMorePoints(
 ) {
 	SURFELWARP_CHECK_GE(nodes.Size(), m_num_bruteforce_nodes) << "Please use BuildIndex() instead!";
 	cudaSafeCall(cudaMemcpyToSymbolAsync(
-		device::reference_node_coordinates,
+		device::reference_node_coordinates,  // 更新控制节点
 		nodes.RawPtr(),
 		nodes.Size() * sizeof(float4),
 		0, // no offset
@@ -321,20 +321,24 @@ void surfelwarp::ReferenceNodeSkinner::replaceWithMorePoints(
 	m_num_bruteforce_nodes = nodes.Size();
 }
 
+// 这个方法其实就是把节点同步过来
 void surfelwarp::ReferenceNodeSkinner::buildBruteForceIndex(
 	const DeviceArrayView<float4> &nodes,
 	cudaStream_t stream
 ) {
 	//If the new nodes is more than previous nodes
+	// 如果当前的控制节点更多了，直接将其同步过来，对现在的节点进行replace
 	if(nodes.Size() >= m_num_bruteforce_nodes) {
 		replaceWithMorePoints(nodes, stream);
 		return;
 	}
 	
 	//Check the size
+	// 节点的数量不应该大于某个阈值
 	SURFELWARP_CHECK(nodes.Size() <= Constants::kMaxNumNodes) << "Too many nodes";
 	
 	//First clear the buffer
+	// 为什么要把buffer清空呢，搞不懂
 	fillInvalidConstantPoints(stream);
 	
 	//Copy the value to device

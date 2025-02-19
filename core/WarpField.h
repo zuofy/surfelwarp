@@ -22,8 +22,8 @@ namespace surfelwarp {
 	class WarpField {
 	private:
 		//The sync members that might be accessed on host
-		SynchronizeArray<float4> m_reference_node_coords;
-		SynchronizeArray<DualQuaternion> m_node_se3;
+		SynchronizeArray<float4> m_reference_node_coords;  // node节点的坐标
+		SynchronizeArray<DualQuaternion> m_node_se3;  // node节点的初始化双四元数矩阵
 		
 		//These property will be uploaded from host to device
 		DeviceBufferArray<ushort4> m_node_knn;
@@ -31,6 +31,7 @@ namespace surfelwarp {
 		
 		//The member that will only be accessed on device
 		DeviceBufferArray<float4> m_live_node_coords;
+		// m_reference_node_coords中每个节点最近的八个节点的序号以及距离
 		DeviceBufferArray<ushort2> m_node_graph;
 
 		//This class need full access to warp field

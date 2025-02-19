@@ -99,8 +99,11 @@ surfelwarp::WarpField::LiveGeometryUpdaterInput surfelwarp::WarpField::GeometryU
 
 surfelwarp::WarpField::SkinnerInput surfelwarp::WarpField::SkinnerAccess() {
 	SkinnerInput skinner_input;
+	// 返回节点的坐标
 	skinner_input.reference_node_coords = m_reference_node_coords.DeviceArrayReadOnly();
+	// 返回节点的knn暂时哈没有
 	skinner_input.node_knn = m_node_knn.ArraySlice();
+	// 返回节点knn的权重，暂时还没有
 	skinner_input.node_knn_weight = m_node_knn_weight.ArraySlice();
 	return skinner_input;
 }
