@@ -26,27 +26,27 @@ void surfelwarp::ImageProcessor::syncAllProcessorStream() {
 }
 
 void surfelwarp::ImageProcessor::ProcessFrameStreamed(CameraObservation & observation, size_t frame_idx) {
-	FetchFrame(frame_idx);
-	UploadDepthImage(m_processor_stream[0]);
-	UploadRawRGBImage(m_processor_stream[0]);
+	FetchFrame(frame_idx);  // 加载图像
+	UploadDepthImage(m_processor_stream[0]);  // 将深度图像转移到gpu上
+	UploadRawRGBImage(m_processor_stream[0]);  // 将rgb图像转移到gpu上
 
 	//This seems cause some problem ,disable it at first
 	//ReprojectDepthToRGB(stream);
 
-	ClipFilterDepthImage(m_processor_stream[0]);
-	ClipNormalizeRGBImage(m_processor_stream[0]);
+	ClipFilterDepthImage(m_processor_stream[0]);  // 滤波是干啥的，滤波就是将一个范围内的深度图用个高斯核卷积一下，感觉能够平滑一下点云
+	ClipNormalizeRGBImage(m_processor_stream[0]);  // 归一化RGB图像，滤波灰度图像和前一帧的归一化RGB图像
 
 	//The geometry map
-	BuildVertexConfigMap(m_processor_stream[0]);
-	BuildNormalRadiusMap(m_processor_stream[0]);
-	BuildColorTimeTexture(frame_idx, m_processor_stream[0]);
+	BuildVertexConfigMap(m_processor_stream[0]);  // 初始化了顶点和置信度的信息，但是置信度初始化为1，应该是信息还没处理完吧
+	BuildNormalRadiusMap(m_processor_stream[0]);  // 初始化法线和半径
+	BuildColorTimeTexture(frame_idx, m_processor_stream[0]);  // 初始化颜色和时间（颜色、0，时间，时间）
 
 	//Sync here
 	cudaSafeCall(cudaStreamSynchronize(m_processor_stream[0]));
 
 	//Invoke other expensive computations
-	SegmentForeground(frame_idx, m_processor_stream[0]); //This doesn't block, even for hashing based method
-	FindCorrespondence(m_processor_stream[1]); //This will block, thus sync inside
+	SegmentForeground(frame_idx, m_processor_stream[0]); //This doesn't block, even for hashing based method // 分割
+	FindCorrespondence(m_processor_stream[1]); //This will block, thus sync inside  // GPC光流
 
 	//The gradient map depends on filtered mask
 	cudaSafeCall(cudaStreamSynchronize(m_processor_stream[0]));
@@ -78,5 +78,5 @@ void surfelwarp::ImageProcessor::ProcessFrameStreamed(CameraObservation & observ
 
 	//The correspondence pixel pairs
 	const auto& pixel_pair_array = CorrespondencePixelPair();
-	observation.correspondence_pixel_pairs = DeviceArrayView<ushort4>(pixel_pair_array.ptr(), pixel_pair_array.size());
+	observation.correspondence_pixel_pairs = DeviceArrayView<ushort4>(pixel_pair_array.ptr(), pixel_pair_array.size());  // 还有对应的像素对
 }

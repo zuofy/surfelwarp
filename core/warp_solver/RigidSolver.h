@@ -23,18 +23,18 @@ namespace surfelwarp {
 		
 		//The rendered map from renderer
 		struct {
-			cudaTextureObject_t live_vertex_map;
-			cudaTextureObject_t live_normal_map;
+			cudaTextureObject_t live_vertex_map;  // live帧的顶点
+			cudaTextureObject_t live_normal_map;  // live帧的法线
 		} m_solver_maps;
 		
 		//The map from observation
 		struct {
-			cudaTextureObject_t vertex_map;
-			cudaTextureObject_t normal_map;
+			cudaTextureObject_t vertex_map;  // 当前观察到的顶点图
+			cudaTextureObject_t normal_map;  // 当前观察到的法线图
 		} m_observation;
 		
 		//The initial transformation
-		mat34 m_curr_world2camera;
+		mat34 m_curr_world2camera;  // 上一帧的w2c方程
 	
 	public:
 		using Ptr = std::shared_ptr<RigidSolver>;

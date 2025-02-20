@@ -1,9 +1,10 @@
 #version 450 core
-
+// 瞎几把猜猜
+// 这个东西应该和GLSurfelGeometryVBO输入的是一样的
 layout(location = 0) in vec4 reference_vertex_confid;
 layout(location = 1) in vec4 reference_normal_radius;
-layout(location = 2) in vec4 warp_vertex;
-layout(location = 3) in vec4 warp_normal;
+layout(location = 2) in vec4 warp_vertex;  // 瞎猜就是live里的数据
+layout(location = 3) in vec4 warp_normal;  // 瞎猜就是live里的数据
 layout(location = 4) in vec4 color_time;
 
 out vec4 vs_out_reference_vertex;
@@ -39,6 +40,7 @@ void main() {
     vec4 warp_vertex_camera = world2camera * vec4(warp_vertex.xyz, 1.0);
     if(warp_vertex_camera.z > (width_height_maxdepth_currtime.z + 0.05)
     || warp_vertex_camera.z < 0
+    // 置信度小于10而且参考帧的值和当前之间的帧序号插值超过3
     || (reference_vertex_confid.w < confid_time_threshold.x && (abs(color_time.z - width_height_maxdepth_currtime.w) >= confid_time_threshold.y))
     ) {
         //Make it outside the screes of [-1 1]

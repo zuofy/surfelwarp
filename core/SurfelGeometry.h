@@ -32,8 +32,8 @@ namespace surfelwarp {
 		friend class DoubleBufferCompactor; //compact from one buffer to another in double buffer setup
 		
 		//These are owned
-		DeviceBufferArray<ushort4> m_surfel_knn;  // ？？大胆猜测下，这里存储的是每个点的邻居点
-		DeviceBufferArray<float4> m_surfel_knn_weight;  // ？？大胆猜测下，这里存储的是每个点的邻居点的权重
+		DeviceBufferArray<ushort4> m_surfel_knn;  // 这里存储的是每个点的邻居节点的索引，四个邻居
+		DeviceBufferArray<float4> m_surfel_knn_weight;  // 这里存储的是每个点的邻居节点的权重，四个邻居
 		
 		//The size recorded for recovering
 		size_t m_num_valid_surfels;  // 有效的surfel数量，初始化为0

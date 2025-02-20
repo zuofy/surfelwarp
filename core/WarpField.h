@@ -26,13 +26,13 @@ namespace surfelwarp {
 		SynchronizeArray<DualQuaternion> m_node_se3;  // node节点的初始化双四元数矩阵
 		
 		//These property will be uploaded from host to device
-		DeviceBufferArray<ushort4> m_node_knn;
-		DeviceBufferArray<float4> m_node_knn_weight;
+		DeviceBufferArray<ushort4> m_node_knn;  // node节点最近的四个邻居node
+		DeviceBufferArray<float4> m_node_knn_weight;  // node节点最近的四个邻居的权重
 		
 		//The member that will only be accessed on device
 		DeviceBufferArray<float4> m_live_node_coords;
 		// m_reference_node_coords中每个节点最近的八个节点的序号以及距离
-		DeviceBufferArray<ushort2> m_node_graph;
+		DeviceBufferArray<ushort2> m_node_graph;  // 为什么存储了最近的八个节点，又存储了最近的四个节点呢，以及这些节点的权重呢
 
 		//This class need full access to warp field
 		friend class WarpFieldUpdater;

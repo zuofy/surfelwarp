@@ -44,7 +44,7 @@ surfelwarp::SurfelWarpSerial::SurfelWarpSerial() {
 	m_renderer = std::make_shared<Renderer>(config.clip_image_rows(), config.clip_image_cols());
 	
 	//Map the resource into geometry
-	m_renderer->MapSurfelGeometryToCuda(0, *(m_surfel_geometry[0]));  // 蜜汁操作，为什么映射到gpu之后又unmap，这里为什么要做一次这个操作呢
+	m_renderer->MapSurfelGeometryToCuda(0, *(m_surfel_geometry[0]));  这里是将二者绑定到一起了吧，太牛了
 	m_renderer->MapSurfelGeometryToCuda(1, *(m_surfel_geometry[1]));
 	m_renderer->UnmapSurfelGeometryFromCuda(0);
 	m_renderer->UnmapSurfelGeometryFromCuda(1);
@@ -107,24 +107,34 @@ void surfelwarp::SurfelWarpSerial::ProcessFirstFrame() {
 	// 返回当前的node节点和节点的knn和knn weight
 	auto skinner_warpfield = m_warp_field->SkinnerAccess();
 	// 这里就要进行绑定了呀
+	// 绑定好之后就找到最近的四个节点的坐标和最近节点的权重
 	m_reference_knn_skinner->PerformSkinning(skinner_geometry, skinner_warpfield);
 
 	//Unmap it
+	// 这里应该是把节点拿回来吧
 	m_renderer->UnmapSurfelGeometryFromCuda(m_updated_geometry_index);
 	
 	//Update the index
-	m_frame_idx++;
+	m_frame_idx++; // 第一帧处理完毕就可以处理第二帧了
 }
 
 void surfelwarp::SurfelWarpSerial::ProcessNextFrameWithReinit(bool offline_save) {
 	//Draw the required maps, assume the buffer is not mapped to cuda at input
+	// 显示有多少个有效的点，这里就是显示点的数量
 	const auto num_vertex = m_surfel_geometry[m_updated_geometry_index]->NumValidSurfels();
+	// 这里有点没搞懂，现在处理的是第二帧，为什么要减去1呢
 	const float current_time = m_frame_idx - 1;
+	// 获取当前的w2c矩阵
 	const Matrix4f init_world2camera = m_camera.GetWorld2CameraEigen();
 
 	//Check the frame and draw
 	SURFELWARP_CHECK(m_frame_idx >= m_reinit_frame_idx);
+	// 这里设置了一个阈值，这个阈值表示的每10帧要怎么样一次，如果当前帧和起始帧相差为12帧以内为true
+	// Stable confidence threshold
+	// 为什么设置这个值
+	// The surfel remains unstable for a long time,
 	const bool draw_recent = shouldDrawRecentObservation();
+	// 这里好像是做了啥处理，但是我好像看不明白
 	if(draw_recent) {
 		m_renderer->DrawSolverMapsWithRecentObservation(num_vertex, m_updated_geometry_index, current_time, init_world2camera);
 	}
@@ -133,13 +143,16 @@ void surfelwarp::SurfelWarpSerial::ProcessNextFrameWithReinit(bool offline_save)
 	}
 	
 	//Map to solver maps
-	Renderer::SolverMaps solver_maps;
-	m_renderer->MapSolverMapsToCuda(solver_maps);
-	m_renderer->MapSurfelGeometryToCuda(m_updated_geometry_index);
+	Renderer::SolverMaps solver_maps;  // 难道现在就要开始求解了吗
+	m_renderer->MapSolverMapsToCuda(solver_maps);  // 放到gpu里
+	m_renderer->MapSurfelGeometryToCuda(m_updated_geometry_index);  // 管他呢，先搞到gpu里
 	
 	//Process the next depth frame
-	CameraObservation observation;
+	// 问题1，光流法没看懂
+	// 问题2，为什么要对mask搞梯度，这个我是一点都没看懂，把边缘滤出来？？？？
+	CameraObservation observation;  // 加载图像，把这张图像的老底都翻出来了，我只能说牛逼呀
 	//m_image_processor->ProcessFrameSerial(observation, m_frame_idx);
+	// 这里就是加载图像了，只能说作者真牛逼，我是一点都没看懂呀
 	m_image_processor->ProcessFrameStreamed(observation, m_frame_idx);
 	
 	//First perform rigid solver

@@ -237,6 +237,7 @@ namespace surfelwarp {
 		*/
 	// 忘记这个密度图和前景mask图的分别代表什么意思了，密度图是不是就是滤波后的图像，前景mask是不是就是加上mask后的图像
 	private:
+	    // 我去，我靠，为啥给foreground_mask搞一个gradient map呀
 		CudaTextureSurface m_foreground_mask_gradient_map_collect;  // 计算一个梯度，正好可以用在头发丝重建
 		CudaTextureSurface m_density_gradient_map_collect;  // 计算一个梯度，正好能用在头发丝重建
 		void allocateGradientMap();

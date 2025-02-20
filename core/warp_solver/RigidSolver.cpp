@@ -39,6 +39,7 @@ void surfelwarp::RigidSolver::SetInputMaps(
 	m_curr_world2camera = init_world2camera;
 }
 
+// 最大循环次数为3次
 surfelwarp::mat34 surfelwarp::RigidSolver::Solve(int max_iters, cudaStream_t stream) {
 	//The solver iteration
 	for(int i = 0; i < max_iters; i++) {

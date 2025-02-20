@@ -93,7 +93,7 @@ namespace surfelwarp { namespace device {
 			heap.update(k + 1, dist_1);
 			heap.update(k + 2, dist_2);
 			heap.update(k + 3, dist_3);
-		}//End of iteration over all nodes
+		}//End of iteration over all nodes // 找到这些点并且按照从大到小的顺序排序
 	}
 	
 	//This method is deprecated and should not be used in later code
