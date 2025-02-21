@@ -81,9 +81,9 @@ surfelwarp::WarpField::SolverInput surfelwarp::WarpField::SolverAccess() const {
 	//applyRandomSE3ToWarpField(node_se3_slice, 0.01, 0.02);
 	
 	SolverInput solver_input;
-	solver_input.node_se3 = m_node_se3.DeviceArrayReadOnly();
-	solver_input.reference_node_coords = m_reference_node_coords.DeviceArrayReadOnly();
-	solver_input.node_graph = m_node_graph.ArrayReadOnly();
+	solver_input.node_se3 = m_node_se3.DeviceArrayReadOnly();  // 双四元数
+	solver_input.reference_node_coords = m_reference_node_coords.DeviceArrayReadOnly();  // 节点的坐标
+	solver_input.node_graph = m_node_graph.ArrayReadOnly();  // // m_reference_node_coords中每个节点最近的八个节点的序号以及距离
 	return solver_input;
 }
 

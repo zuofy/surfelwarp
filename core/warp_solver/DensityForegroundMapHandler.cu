@@ -47,13 +47,14 @@ namespace surfelwarp { namespace device {
 		cudaTextureObject_t index_map,
 		cudaTextureObject_t filtered_foreground_mask,
 		const DeviceArrayView2D<KNNAndWeight> knn_map,
-		const DualQuaternion* device_warp_field,
+		const DualQuaternion* device_warp_field,  // 每个节点对应的四元数
 		const Intrinsic intrinsic, const mat34 world2camera,
 		unsigned* valid_rgb_indicator_array,
 		unsigned* valid_foregound_mask_indicator_array
 	) {
 		const int x = threadIdx.x + blockDim.x*blockIdx.x;
 		const int y = threadIdx.y + blockDim.y*blockIdx.y;
+		// 只在这个范围内寻找
 		if (x >= knn_map.Cols() || y >= knn_map.Rows()) return;
 
 		//The indicator will must be written to pixel_occupied_array
@@ -65,25 +66,31 @@ namespace surfelwarp { namespace device {
 		if(surfel_index != d_invalid_index)
 		{
 			//Get the vertex
-			const float4 can_vertex4 = tex2D<float4>(reference_vertex_map, x, y);
-			const float4 can_normal4 = tex2D<float4>(reference_normal_map, x, y);
-			const KNNAndWeight knn = knn_map(y, x);
+			const float4 can_vertex4 = tex2D<float4>(reference_vertex_map, x, y);  // reference当前的顶点
+			const float4 can_normal4 = tex2D<float4>(reference_normal_map, x, y);  // reference当前的法线
+			const KNNAndWeight knn = knn_map(y, x);  // 当前像素对应的knn节点
+			// 求解一下当前节点对应的四元数
 			DualQuaternion dq_average = averageDualQuaternion(device_warp_field, knn.knn, knn.weight);
 			const mat34 se3 = dq_average.se3_matrix();
 
 			//And warp it
+			// 获取一下对当前节点旋转平移后的位置
 			const float3 warped_vertex = se3.rot * can_vertex4 + se3.trans;
 			const float3 warped_normal = se3.rot * can_normal4;
 			
 			//Transfer to the camera frame
+			// 找到其在相机空间中的位置以及相机空间中的法线
 			const float3 warped_vertex_camera = world2camera.rot * warped_vertex + world2camera.trans;
 			const float3 warped_normal_camera = world2camera.rot * warped_normal;
 			//Check the normal of this pixel
+			// 因为在相机空间，视线方向和点的位置是一致的
 			const float3 view_direction = normalized(warped_vertex_camera);
+			// 求视线方向和法线方向的夹角
 			const float viewangle_cos = - dot(view_direction, warped_normal_camera);
 			
 			//Project the vertex into image
 			//The image coordinate of this vertex
+			// 求这个的像素坐标
 			const int2 img_coord = {
 				__float2int_rn(((warped_vertex_camera.x / (warped_vertex_camera.z + 1e-10)) * intrinsic.focal_x) + intrinsic.principal_x),
 				__float2int_rn(((warped_vertex_camera.y / (warped_vertex_camera.z + 1e-10)) * intrinsic.focal_y) + intrinsic.principal_y)
@@ -100,6 +107,7 @@ namespace surfelwarp { namespace device {
 			} // The vertex project to a valid image pixel
 
 			//Mark the rgb as always valid if the pixel is valid?
+			// 前后对不上呀，驴唇不对马嘴呀
 			valid_rgb = 1;
 
 		} // The reference vertex is valid
@@ -228,6 +236,7 @@ void surfelwarp::DensityForegroundMapHandler::QueryCompactedColorPixelArraySize(
 
 void surfelwarp::DensityForegroundMapHandler::CompactValidMaskPixel(cudaStream_t stream) {
 	//Do a prefix sum
+	// 前缀和是为了筛选出来需要的像素
 	m_mask_pixel_indicator_prefixsum.InclusiveSum(m_mask_pixel_indicator_map, stream);
 	
 	//Invoke the kernel

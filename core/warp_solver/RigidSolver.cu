@@ -59,6 +59,7 @@ namespace surfelwarp { namespace device {
 			if(x < image_cols && y < image_rows)
 			{
 				//Load from the rendered maps
+				// 获取当前处理的坐标下顶点和法线的值
 				const float4 model_v4 = tex2D<float4>(model_maps.vertex_map, x, y);
 				const float4 model_n4 = tex2D<float4>(model_maps.normal_map, x, y);
 
@@ -76,6 +77,7 @@ namespace surfelwarp { namespace device {
 				if(img_coord.x < image_cols && img_coord.y < image_rows)
 				{
 					//Load the depth map
+					// 获取这个投影坐标下的深度值
 					const float4 depth_v4 = tex2D<float4>(observation_maps.vertex_map, img_coord.x, img_coord.y);
 					const float4 depth_n4 = tex2D<float4>(observation_maps.normal_map, img_coord.x, img_coord.y);
 
@@ -84,7 +86,9 @@ namespace surfelwarp { namespace device {
 						//Pass
 					}
 					else {
+						// 这个不就是公式9嘛
 						err = dotxyz(depth_n4, make_float4(model_v.x - depth_v4.x, model_v.y - depth_v4.y, model_v.z - depth_v4.z, 0.0f));
+						// 这里是不是就是求梯度要用的东西呀
 						*(float3*)jacobian = cross_xyz(model_v, depth_n4);
 						*(float3*)(jacobian + 3) = make_float3(depth_n4.x, depth_n4.y, depth_n4.z);
 					}
@@ -92,6 +96,7 @@ namespace surfelwarp { namespace device {
 			}
 
 			//Time to do reduction
+			// 一个block内有256个线程，所有线程采用每32个分配一块，总共num_warps，也就是8块
 			__shared__ float reduce_mem[total_shared_size][num_warps];
 			unsigned shift = 0;
 			const auto warp_id = threadIdx.x >> 5;
@@ -102,6 +107,7 @@ namespace surfelwarp { namespace device {
 				for (int j = i; j < 6; j++) { //Column index, the matrix is symmetry
 					float data = (jacobian[i] * jacobian[j]);
 					data = warp_scan(data);
+					// 这里就得看看看这个data是多少维度的
 					if (lane_id == 31) {
 						reduce_mem[shift++][warp_id] = data;
 					}
@@ -135,7 +141,7 @@ namespace surfelwarp { namespace device {
 	
 	__global__ void rigidSolveIterationKernel(
 		const RigidSolverDevice solver,
-		PtrStep<float> reduce_buffer
+		PtrStep<float> reduce_buffer  
 	) {
 		solver.solverIteration(reduce_buffer);
 	}
@@ -188,8 +194,8 @@ void surfelwarp::RigidSolver::rigidSolveDeviceIteration(cudaStream_t stream) {
 	solver.image_cols = m_image_cols;
 	
 	//The map from renderer
-	solver.model_maps.vertex_map = m_solver_maps.live_vertex_map;
-	solver.model_maps.normal_map = m_solver_maps.live_normal_map;
+	solver.model_maps.vertex_map = m_solver_maps.live_vertex_map;  // 在上一帧的live帧的顶点，初始化就是第一帧的顶点
+	solver.model_maps.normal_map = m_solver_maps.live_normal_map;  // 在上一帧的live帧的法线，初始化就是第一帧的法线
 	
 	//The map from observation
 	solver.observation_maps.vertex_map = m_observation.vertex_map;
@@ -197,6 +203,7 @@ void surfelwarp::RigidSolver::rigidSolveDeviceIteration(cudaStream_t stream) {
 	
 	dim3 blk(device::RigidSolverDevice::block_size);
 	dim3 grid(divUp(m_image_cols * m_image_rows, blk.x));
+	// m_reduce_buffer非常有意思，每个grid都有一个，大小位（21+6），看看怎么用的哈
 	device::rigidSolveIterationKernel<<<grid, blk, 0, stream>>>(solver, m_reduce_buffer);
 	
 	//Sync and check error

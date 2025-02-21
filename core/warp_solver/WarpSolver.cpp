@@ -171,7 +171,7 @@ void surfelwarp::WarpSolver::releaseDensityForegroundMapBuffer() {
 
 void surfelwarp::WarpSolver::setDensityForegroundHandlerFullInput() {
 	//The current node se3 from iteraion data
-	const auto node_se3 = m_iteration_data.CurrentWarpFieldInput();
+	const auto node_se3 = m_iteration_data.CurrentWarpFieldInput();  // node_se3_init_
 
 	//Hand in the information to handler
 #if defined(USE_RENDERED_RGBA_MAP_SOLVER)

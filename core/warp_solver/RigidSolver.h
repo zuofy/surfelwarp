@@ -57,7 +57,7 @@ namespace surfelwarp {
 	
 	private:
 		DeviceArray2D<float> m_reduce_buffer;
-		SynchronizeArray<float> m_reduced_matrix_vector;
+		SynchronizeArray<float> m_reduced_matrix_vector;  // 一个(21 + 6)的array是用来干什么的
 		void allocateReduceBuffer();
 		void rigidSolveDeviceIteration(cudaStream_t stream = 0);
 		

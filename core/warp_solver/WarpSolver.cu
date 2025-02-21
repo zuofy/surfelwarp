@@ -5,8 +5,8 @@ namespace surfelwarp { namespace device {
 	
 	__global__ void queryPixelKNNKernel(
 		cudaTextureObject_t index_map,
-		const ushort4* surfel_knn,
-		const float4* surfel_knn_weight,
+		const ushort4* surfel_knn,  // 妈的这里存的是每个顶点的四个knn节点
+		const float4* surfel_knn_weight,  // 去你妈的，这里边存储的是每个节点对应的权重，我他妈的，仿佛看到了大傻逼就是我，怎么代码这么多，代码这么乱呀
 		//Output
 		PtrStepSz<KNNAndWeight> knn_map
 	) {

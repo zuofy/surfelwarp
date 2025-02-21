@@ -78,7 +78,8 @@ void surfelwarp::ImageTermKNNFetcher::MarkPotentialMatchedPixels(cudaStream_t st
 
 
 void surfelwarp::ImageTermKNNFetcher::CompactPotentialValidPixels(cudaStream_t stream) {
-	//Do a prefix sum
+	// Do a prefix sum
+	// 执行这个能够有个非常有益的用处，能够说明这是第几个有用的像素
 	m_indicator_prefixsum.InclusiveSum(m_potential_pixel_indicator, stream);
 
 	//Invoke the kernel

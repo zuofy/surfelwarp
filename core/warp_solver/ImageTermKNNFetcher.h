@@ -23,6 +23,8 @@ namespace surfelwarp {
 		unsigned m_image_width;
 		
 		//The info from solver
+		// 有点意思，这个东西的knn在图像空间的
+		// 然后还跟着一个index_map，这个表示的是一个像素对应的顶点是哪个玩意儿
 		struct {
 			DeviceArrayView2D<KNNAndWeight> knn_map;
 			cudaTextureObject_t index_map;
@@ -46,19 +48,22 @@ namespace surfelwarp {
 		 */
 	private:
 		//A fixed size array to indicator the pixel validity
+		// 起始就是个标记，用于标记哪些像素是有用的，有用的像素为1，无用的像素为0
 		DeviceArray<unsigned> m_potential_pixel_indicator;
 	public:
 		//This method, only collect pixel that has non-zero index map value
 		//All these pixels are "potentially" matched with depth pixel with appropriate SE3
+		// 标记哪些像素是有用的
 		void MarkPotentialMatchedPixels(cudaStream_t stream = 0);
 
 
 		//After all the potential pixels are marked
+		// 这里的目的就是为了找到所有的有效像素，并且进行标记
 	private:
-		PrefixSum m_indicator_prefixsum;
-		DeviceBufferArray<ushort2> m_potential_pixels;
-		DeviceBufferArray<ushort4> m_dense_image_knn;
-		DeviceBufferArray<float4> m_dense_image_knn_weight;
+		PrefixSum m_indicator_prefixsum;  // 有效像素前缀和，指明这是第几个有用的像素
+		DeviceBufferArray<ushort2> m_potential_pixels;  // 一个数组，索引表示第几个有用像素，值表示像素的位置
+		DeviceBufferArray<ushort4> m_dense_image_knn;  // 存储的是每个有用像素对应的节点的索引
+		DeviceBufferArray<float4> m_dense_image_knn_weight;  // 存储的是每个有用像素对应的knn的权重
 	public:
 		void CompactPotentialValidPixels(cudaStream_t stream = 0);
 

@@ -14,10 +14,11 @@ namespace surfelwarp {
 	
 	class PenaltyConstants {
 	private:
-		float m_lambda_smooth;
-		float m_lambda_density;
-		float m_lambda_foreground;
-		float m_lambda_feature;
+	    // 展示一下这几个值的大小，按照目前的配置
+		float m_lambda_smooth;  // 2.3
+		float m_lambda_density;  // 0
+		float m_lambda_foreground;  // 0
+		float m_lambda_feature;  // 1
 		
 		//Only modifiable by warp solver
 		friend class SolverIterationData;

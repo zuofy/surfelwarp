@@ -20,20 +20,20 @@ namespace surfelwarp {
 	private:
 		//The info from depth observation
 		struct {
-			DeviceArrayView<ushort4> correspond_pixel_pairs;
-			cudaTextureObject_t depth_vertex_map;
+			DeviceArrayView<ushort4> correspond_pixel_pairs;  // 观测到的gpc模型对应计算的像素对
+			cudaTextureObject_t depth_vertex_map;  // 观测到的顶点图
 		} m_observations;
 		
 		//The information from renderer
 		struct {
-			cudaTextureObject_t reference_vertex_map;
-			cudaTextureObject_t index_map;
-			DeviceArrayView2D<KNNAndWeight> knn_map;
+			cudaTextureObject_t reference_vertex_map;  // reference的顶点图
+			cudaTextureObject_t index_map;  // reference的对应的顶点索引，这个像素位置存的是哪个像素
+			DeviceArrayView2D<KNNAndWeight> knn_map;  // knn的图
 		} m_geometry_maps;
 
 		//The input from warp field
-		DeviceArrayView<DualQuaternion> m_node_se3;
-		mat34 m_camera2world;
+		DeviceArrayView<DualQuaternion> m_node_se3;  // 节点图，保存的是每个节点的SE3，双四元数表示旋转平移
+		mat34 m_camera2world;  // c
 		
 	public:
 		using Ptr = std::shared_ptr<SparseCorrespondenceHandler>;
@@ -64,9 +64,9 @@ namespace surfelwarp {
 		 * not has a reference vertex on that pixel
 		 */
 	private:
-		DeviceBufferArray<unsigned> m_valid_pixel_indicator;
-		PrefixSum m_valid_pixel_prefixsum;
-		DeviceBufferArray<ushort4> m_corrected_pixel_pairs;
+		DeviceBufferArray<unsigned> m_valid_pixel_indicator;  // 用于显示哪个像素是有效的
+		PrefixSum m_valid_pixel_prefixsum;  // 执行前缀和，剔除无用的像素对
+		DeviceBufferArray<ushort4> m_corrected_pixel_pairs;  // 用于保存对应的像素对
 	public:
 		void ChooseValidPixelPairs(cudaStream_t stream = 0);
 	
@@ -74,10 +74,10 @@ namespace surfelwarp {
 		/* Collect the valid depth/reference vertex and their knn
 		 */
 	private:
-		DeviceBufferArray<float4> m_valid_target_vertex;
-		DeviceBufferArray<float4> m_valid_reference_vertex;
-		DeviceBufferArray<ushort4> m_valid_vertex_knn;
-		DeviceBufferArray<float4> m_valid_knn_weight;
+		DeviceBufferArray<float4> m_valid_target_vertex;  // 存储的是世界坐标系下的坐标，也就是当前输入帧的坐标通过相机外参做了一次转换
+		DeviceBufferArray<float4> m_valid_reference_vertex;  // 就是reference的坐标
+		DeviceBufferArray<ushort4> m_valid_vertex_knn;  // 对应的knn
+		DeviceBufferArray<float4> m_valid_knn_weight;  // 对应的knn weight
 
 		//The page-locked memory
 		unsigned* m_correspondence_array_size;

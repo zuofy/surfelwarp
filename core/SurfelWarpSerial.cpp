@@ -155,16 +155,20 @@ void surfelwarp::SurfelWarpSerial::ProcessNextFrameWithReinit(bool offline_save)
 	// 这里就是加载图像了，只能说作者真牛逼，我是一点都没看懂呀
 	m_image_processor->ProcessFrameStreamed(observation, m_frame_idx);
 	
-	//First perform rigid solver
+	// First perform rigid solver
+	// 我靠，仙人板板，这个代码也太难了吧，这玩意儿简直不是人学的
+	// 我靠，cuda都干到warp level了，我现在都感觉我真他妈能搞定吗，这最起码得两个工程师呀
 	m_rigid_solver->SetInputMaps(solver_maps, observation, m_camera.GetWorld2Camera());
 	const mat34 solved_world2camera = m_rigid_solver->Solve();
 	m_camera.SetWorld2Camera(solved_world2camera);
 	
 	//The resource from geometry attributes
+	// 每个surfel的knn和knn权重
 	const auto solver_geometry = m_surfel_geometry[m_updated_geometry_index]->SolverAccess();
 	const auto solver_warpfield = m_warp_field->SolverAccess();
 	
 	//Pass the input to warp solver
+	// 这里比较简单设置输入输出
 	m_warp_solver->SetSolverInputs(
 		observation,
 		solver_maps,
@@ -175,7 +179,9 @@ void surfelwarp::SurfelWarpSerial::ProcessNextFrameWithReinit(bool offline_save)
 	
 	//Solve it
 	//m_warp_solver->SolveSerial();
+	// 开始求解
 	m_warp_solver->SolveStreamed();
+	// 返回求解结果
 	const auto solved_se3 = m_warp_solver->SolvedNodeSE3();
 	
 	//Do a forward warp and build index

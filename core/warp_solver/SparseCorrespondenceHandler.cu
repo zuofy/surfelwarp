@@ -103,13 +103,13 @@ namespace surfelwarp { namespace device {
 	) {
 		const auto idx = threadIdx.x + blockDim.x * blockIdx.x;
 		if(idx >= valid_indicator.Size()) return;
-
+        // 为0就不不处理，因为为0就是无效的
 		if(valid_indicator[idx] != 0) {
-			const auto offset = prefixsum_indicator[idx] - 1;
-			const auto pixel_pair = valid_pixel_pairs[idx];
-			const float4 reference_vertex = tex2D<float4>(reference_vertex_map, pixel_pair.x, pixel_pair.y);
-			const float4 depth_vertex = tex2D<float4>(depth_vertex_map, pixel_pair.z, pixel_pair.w);
-			const auto knn = knn_map(pixel_pair.y, pixel_pair.x); //KNN must be valid
+			const auto offset = prefixsum_indicator[idx] - 1;  // 这是表示后处理后的索引，表示是第几个有效的pair
+			const auto pixel_pair = valid_pixel_pairs[idx];  // 拿出来有效的像素对
+			const float4 reference_vertex = tex2D<float4>(reference_vertex_map, pixel_pair.x, pixel_pair.y);  // reference的顶点
+			const float4 depth_vertex = tex2D<float4>(depth_vertex_map, pixel_pair.z, pixel_pair.w);  // 当前观察的顶点
+			const auto knn = knn_map(pixel_pair.y, pixel_pair.x); //KNN must be valid  // 这个地方对应的knn图
 			
 			//Compute the target vertex
 			const float3 depth_v3 = make_float3(depth_vertex.x, depth_vertex.y, depth_vertex.z);

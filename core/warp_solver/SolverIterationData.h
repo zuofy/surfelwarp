@@ -21,9 +21,11 @@ namespace surfelwarp {
 		};
 		
 		//The input from warp field
+		// 这个才是输入
 		DeviceArrayView<DualQuaternion> node_se3_init_;
 		
 		//The double buffer are mainted in this class
+		// 暂时还不知道干啥，但是和node_se3_init_的大小是一样的
 		DeviceBufferArray<DualQuaternion> node_se3_0_;
 		DeviceBufferArray<DualQuaternion> node_se3_1_;
 		IterationInputFrom m_updated_se3;
@@ -31,6 +33,7 @@ namespace surfelwarp {
 		void updateIterationFlags();
 		
 		//Only need to keep one twist buffer
+		// 这个东西不会就是把上边的东西拆开吧
 		DeviceBufferArray<float> m_twist_update;
 		
 		//The constants for different terms

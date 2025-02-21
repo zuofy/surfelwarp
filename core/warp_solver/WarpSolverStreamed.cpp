@@ -39,7 +39,9 @@ void surfelwarp::WarpSolver::SolveStreamed() {
 
 	//Actual computation
 	buildSolverIndexStreamed();
+	// 最多只会求解五次
 	for(auto i = 0; i < Constants::kNumGaussNewtonIterations; i++) {
+		// 默认将密度设置为了0，所以这里应该就是
 		if (m_iteration_data.IsGlobalIteration())
 			solverIterationGlobalIterationStreamed();
 		else
@@ -51,22 +53,26 @@ void surfelwarp::WarpSolver::SolveStreamed() {
 }
 
 void surfelwarp::WarpSolver::buildSolverIndexStreamed() {
+	// 这里比较有意思了，这里把每个顶点给渲染到了屏幕上，然后根据这个屏幕上的像素，来确定每个位置所用到的knn坐标和knn权重，牛逼
 	QueryPixelKNN(m_solver_stream[0]); //Sync is required here
 	cudaSafeCall(cudaStreamSynchronize(m_solver_stream[0]));
 
 	//FetchPotentialDenseImageTermPixelsFixedIndex
+	// 这里只保存有用的节点，无用的节点就暂时不处理了
 	m_image_knn_fetcher->SetInputs(m_knn_map, m_rendered_maps.index_map);
 	m_image_knn_fetcher->MarkPotentialMatchedPixels(m_solver_stream[0]);
 	m_image_knn_fetcher->CompactPotentialValidPixels(m_solver_stream[0]);
 	//m_image_knn_fetcher->SyncQueryCompactedPotentialPixelSize();
 
 	//FindPotentialForegroundMaskPixelSynced();
+	// 获取有效的像素
 	setDensityForegroundHandlerFullInput();
 	m_density_foreground_handler->MarkValidColorForegroundMaskPixels(m_solver_stream[1]);
 	m_density_foreground_handler->CompactValidMaskPixel(m_solver_stream[1]);
 	//m_density_foreground_handler->QueryCompactedMaskPixelArraySize();
 
 	//SelectValidSparseFeatureMatchedPairs();
+	// 计算像素对
 	SetSparseFeatureHandlerFullInput();
 	m_sparse_correspondence_handler->ChooseValidPixelPairs(m_solver_stream[2]);
 	m_sparse_correspondence_handler->CompactQueryPixelPairs(m_solver_stream[2]);

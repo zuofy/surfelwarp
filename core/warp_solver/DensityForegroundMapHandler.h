@@ -22,35 +22,39 @@ namespace surfelwarp {
 		//The info from config
 		int m_image_height;
 		int m_image_width;
-		Intrinsic m_project_intrinsic;
+		Intrinsic m_project_intrinsic;  // 内参
 		
 		//The info from solver
-		DeviceArrayView<DualQuaternion> m_node_se3;
-		DeviceArrayView2D<KNNAndWeight> m_knn_map;
-		mat34 m_world2camera;
+		DeviceArrayView<DualQuaternion> m_node_se3; // 当前reference的节点对应的双四元数
+		DeviceArrayView2D<KNNAndWeight> m_knn_map; // 每个像素点对应的knn节点坐标和权重
+		mat34 m_world2camera;  // 外参
 		
 		//The maps from depth observation
 		struct {
-			cudaTextureObject_t foreground_mask; // uchar texture
-			cudaTextureObject_t filtered_foreground_mask; // float1 texture
-			cudaTextureObject_t foreground_mask_gradient_map; // float2 texture
+			cudaTextureObject_t foreground_mask;  // 输入帧得前景mask
+			cudaTextureObject_t filtered_foreground_mask;  // 输入帧滤波后的前景mask
+			cudaTextureObject_t foreground_mask_gradient_map;  // 输入帧滤波后的前景mask梯度图
 
 			//The density map from depth
-			cudaTextureObject_t density_map; // float1 texture
-			cudaTextureObject_t density_gradient_map; // float2 texture
+			cudaTextureObject_t density_map;  // 输入帧对应的灰度图
+			cudaTextureObject_t density_gradient_map;  // 输入帧对应的灰度图对应的梯度图
 		} m_depth_observation;
 		
 
 		//The map from renderer
 		struct {
-			cudaTextureObject_t reference_vertex_map;
-			cudaTextureObject_t reference_normal_map;
-			cudaTextureObject_t index_map;
-			cudaTextureObject_t normalized_rgb_map;
+			cudaTextureObject_t reference_vertex_map;  // reference的顶点
+			cudaTextureObject_t reference_normal_map;  // reference的法线
+			cudaTextureObject_t index_map;  // reference的索引
+			cudaTextureObject_t normalized_rgb_map;  // reference的归一化RGB
 		} m_geometry_maps;
 		
 		//The pixel from the indexer
-		ImageTermKNNFetcher::ImageTermPixelAndKNN m_potential_pixels_knn;
+		//包含三个部分
+		// {1.pixels 一个数组，索引表示第几个有用像素，值表示像素的位置
+		//  2.node_knn 存储的是每个有用像素对应的节点的索引
+		//  3.存储的是每个有用像素对应的knn的权重}
+		ImageTermKNNFetcher::ImageTermPixelAndKNN m_potential_pixels_knn; 
 	
 	public:
 		using Ptr = std::shared_ptr<DensityForegroundMapHandler>;
@@ -65,23 +69,23 @@ namespace surfelwarp {
 
 		//Set input
 		void SetInputs(
-			const DeviceArrayView<DualQuaternion>& node_se3,
-			const DeviceArrayView2D<KNNAndWeight>& knn_map,
+			const DeviceArrayView<DualQuaternion>& node_se3,  // 当前的节点对应的双四元数
+			const DeviceArrayView2D<KNNAndWeight>& knn_map,  // 每个像素点对应的knn节点坐标和权重
 			//The foreground mask terms
-			cudaTextureObject_t foreground_mask, 
-			cudaTextureObject_t filtered_foreground_mask,
-			cudaTextureObject_t foreground_gradient_map,
+			cudaTextureObject_t foreground_mask, // 前景mask
+			cudaTextureObject_t filtered_foreground_mask,  // 滤波后的前景mask
+			cudaTextureObject_t foreground_gradient_map,  // 滤波后的前景mask梯度图
 			//The color density terms
-			cudaTextureObject_t density_map,
-			cudaTextureObject_t density_gradient_map,
+			cudaTextureObject_t density_map,  // 灰度图
+			cudaTextureObject_t density_gradient_map,  // 灰度图的梯度图
 			//The rendered maps
-			cudaTextureObject_t reference_vertex_map,
-			cudaTextureObject_t reference_normal_map,
-			cudaTextureObject_t index_map,
-			cudaTextureObject_t normalized_rgb_map,
-			const mat34& world2camera,
+			cudaTextureObject_t reference_vertex_map,  // 参考的顶点
+			cudaTextureObject_t reference_normal_map,  // 参考的法线
+			cudaTextureObject_t index_map,  // 每个像素对应的顶点
+			cudaTextureObject_t normalized_rgb_map,  // 每个像素对应的归一化坐标
+			const mat34& world2camera,  // 当前的相机w2c矩阵
 			//The potential pixels,
-			const ImageTermKNNFetcher::ImageTermPixelAndKNN& potential_pixels_knn
+			const ImageTermKNNFetcher::ImageTermPixelAndKNN& potential_pixels_knn  // 妈的，我崩溃了，这个就是上一步求得稠密的knn那些东西
 		);
 		
 		//Update the node se3
@@ -97,8 +101,8 @@ namespace surfelwarp {
 		 */
 	private:
 		//These should be 2D maps
-		DeviceArray<unsigned> m_color_pixel_indicator_map;
-		DeviceArray<unsigned> m_mask_pixel_indicator_map;
+		DeviceArray<unsigned> m_color_pixel_indicator_map;  // 某个位置的周围都有点的索引，那这个位置就是有效的
+		DeviceArray<unsigned> m_mask_pixel_indicator_map;  // 某个位置的前景mask不为0，这个位置也是有效的
 	public:
 		void MarkValidColorForegroundMaskPixels(cudaStream_t stream = 0);
 		
@@ -107,10 +111,10 @@ namespace surfelwarp {
 		 */
 	private:
 		PrefixSum m_color_pixel_indicator_prefixsum;
-		PrefixSum m_mask_pixel_indicator_prefixsum;
-		DeviceBufferArray<ushort2> m_valid_color_pixel, m_valid_mask_pixel;
-		DeviceBufferArray<ushort4> m_valid_color_pixel_knn, m_valid_mask_pixel_knn;
-		DeviceBufferArray<float4> m_valid_color_pixel_knn_weight, m_valid_mask_pixel_knn_weight;
+		PrefixSum m_mask_pixel_indicator_prefixsum;  // 前缀和，为了筛选出来有用的点
+		DeviceBufferArray<ushort2> m_valid_color_pixel, m_valid_mask_pixel;  // 一个数组，索引表示第几个有用像素，值表示像素的位置，有效的像素和mask
+		DeviceBufferArray<ushort4> m_valid_color_pixel_knn, m_valid_mask_pixel_knn;  // 存储的是每个有用像素对应的节点的索引，有效的像素和mask
+		DeviceBufferArray<float4> m_valid_color_pixel_knn_weight, m_valid_mask_pixel_knn_weight;  // 存储的是每个有用像素对应的knn的权重，有效的像素和mask
 
 		//The pagelocked memory
 		unsigned* m_num_mask_pixel;

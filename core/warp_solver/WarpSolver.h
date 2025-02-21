@@ -43,7 +43,8 @@ namespace surfelwarp {
 		WarpField::SolverInput m_warpfield_input;
 		mat34 m_world2camera;
 		
-		//The interation data maintained by the solver
+		// The interation data maintained by the solver
+		// 当前初始化的方式是WarpFieldInit，初始内容是上一帧的node_se3_init_
 		SolverIterationData m_iteration_data;
 		
 	public:
@@ -93,7 +94,7 @@ namespace surfelwarp {
 		 * The knn map is in the same resolution as image
 		 */
 	private:
-		DeviceArray2D<KNNAndWeight> m_knn_map;
+		DeviceArray2D<KNNAndWeight> m_knn_map;  // 这个东西就是将每个像素对应的knn和权重取出来
 	public:
 		void QueryPixelKNN(cudaStream_t stream = 0);
 		
