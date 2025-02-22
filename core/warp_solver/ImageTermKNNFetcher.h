@@ -48,7 +48,7 @@ namespace surfelwarp {
 		 */
 	private:
 		//A fixed size array to indicator the pixel validity
-		// 起始就是个标记，用于标记哪些像素是有用的，有用的像素为1，无用的像素为0
+		// 其实就是个标记，用于标记哪些像素是有用的，有用的像素为1，无用的像素为0
 		DeviceArray<unsigned> m_potential_pixel_indicator;
 	public:
 		//This method, only collect pixel that has non-zero index map value
@@ -68,7 +68,7 @@ namespace surfelwarp {
 		void CompactPotentialValidPixels(cudaStream_t stream = 0);
 
 	private:
-		unsigned* m_num_potential_pixel;
+		unsigned* m_num_potential_pixel;  // 有多少个有用的像素
 	public:
 		void SyncQueryCompactedPotentialPixelSize(cudaStream_t stream = 0);
 		

@@ -26,25 +26,26 @@ namespace surfelwarp {
 		Intrinsic m_project_intrinsic;
 		
 		//The info from solver
-		DeviceArrayView<DualQuaternion> m_node_se3;
-		DeviceArrayView2D<KNNAndWeight> m_knn_map;
+		DeviceArrayView<DualQuaternion> m_node_se3;  // 节点的索引
+		DeviceArrayView2D<KNNAndWeight> m_knn_map;  // 每个像素对应的knn和权重
 		mat34 m_world2camera;
 		mat34 m_camera2world;
 
 		//The info from depth input
 		struct {
-			cudaTextureObject_t vertex_map;
-			cudaTextureObject_t normal_map;
+			cudaTextureObject_t vertex_map;  // 输入的顶点
+			cudaTextureObject_t normal_map;  // 输入的法线
 		} m_depth_observation;
 		
 		//The info from rendered maps
 		struct {
-			cudaTextureObject_t reference_vertex_map;
-			cudaTextureObject_t reference_normal_map;
-			cudaTextureObject_t index_map;
+			cudaTextureObject_t reference_vertex_map;  // reference的顶点
+			cudaTextureObject_t reference_normal_map;  // reference的法线
+			cudaTextureObject_t index_map;  // reference对应顶点的索引
 		} m_geometry_maps;
 		
 		//The info from image term fetcher
+		// 有效像素的位置 对应节点的索引 对应节点的权重
 		ImageTermKNNFetcher::ImageTermPixelAndKNN m_potential_pixels_knn;
 		
 	public:

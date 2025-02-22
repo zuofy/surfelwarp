@@ -171,7 +171,7 @@ namespace surfelwarp { namespace device {
 
 void surfelwarp::NodePair2TermsIndex::buildTermKeyValue(cudaStream_t stream) {
 	//Correct the size of array
-	const auto num_kvs = NumKeyValuePairs();
+	const auto num_kvs = NumKeyValuePairs();  // 不太一样哟，另外一个瘪三乘4 2，这里乘6 1
 	m_nodepair_keys.ResizeArrayOrException(num_kvs);
 	m_term_idx_values.ResizeArrayOrException(num_kvs);
 	
@@ -183,7 +183,7 @@ void surfelwarp::NodePair2TermsIndex::buildTermKeyValue(cudaStream_t stream) {
 		m_term2node.node_graph,
 		m_term2node.foreground_mask_knn,
 		m_term2node.sparse_feature_knn,
-		m_term_offset,
+		m_term_offset,  // 每个term有多少个元素
 		m_nodepair_keys.Ptr(),
 		m_term_idx_values.Ptr()
 	);
@@ -249,6 +249,7 @@ void surfelwarp::NodePair2TermsIndex::buildSymmetricCompactedIndex(cudaStream_t 
 }
 
 void surfelwarp::NodePair2TermsIndex::QueryValidNodePairSize(cudaStream_t stream) {
+	// 有多少个有效对
 	const unsigned* num_unique_pair_dev = m_segment_label_prefixsum.valid_prefixsum_array.ptr() + (m_segment_label_prefixsum.valid_prefixsum_array.size() - 1);
 	unsigned num_unique_pair;
 	cudaSafeCall(cudaMemcpyAsync(&num_unique_pair, num_unique_pair_dev, sizeof(unsigned), cudaMemcpyDeviceToHost, stream));

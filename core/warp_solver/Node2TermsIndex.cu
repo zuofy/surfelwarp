@@ -119,10 +119,11 @@ namespace surfelwarp { namespace device {
 
 void surfelwarp::Node2TermsIndex::buildTermKeyValue(cudaStream_t stream) {
 	//Correct the size
+	// 总共有多少个索引，哎呀妈呀震惊
 	const auto num_kv_pairs = NumKeyValuePairs();
 	m_node_keys.ResizeArrayOrException(num_kv_pairs);
 	m_term_idx_values.ResizeArrayOrException(num_kv_pairs);
-
+    // 有效像素，八节点图，有效mask，有效点云所有有效的数量
 	const auto num_terms = NumTerms();
 	dim3 blk(128);
 	dim3 grid(divUp(num_terms, blk.x));
@@ -146,9 +147,11 @@ void surfelwarp::Node2TermsIndex::buildTermKeyValue(cudaStream_t stream) {
 
 void surfelwarp::Node2TermsIndex::sortCompactTermIndex(cudaStream_t stream) {
 	//First sort it
+	// 按照key值进行了个排序
 	m_node2term_sorter.Sort(m_node_keys.ArrayView(), m_term_idx_values.ArrayView(), stream);
 
 	//Correct the size of nodes
+	// 节点的数量是固定的，这里求解的是有多少个节点
 	m_node2term_offset.ResizeArrayOrException(m_num_nodes + 1);
 	const auto offset_slice = m_node2term_offset.ArraySlice();
 	const DeviceArrayView<unsigned short> sorted_key_view(m_node2term_sorter.valid_sorted_key.ptr(), m_node2term_sorter.valid_sorted_key.size());

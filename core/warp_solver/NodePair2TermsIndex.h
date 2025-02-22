@@ -63,22 +63,22 @@ namespace surfelwarp {
 	private:
 		//The input map from terms to nodes, the input might be empty for dense_density, foreground mask and sparse feature
 		struct {
-			DeviceArrayView<ushort4> dense_image_knn; //Each depth scalar term has 4 nearest neighbour
-			DeviceArrayView<ushort2> node_graph;
+			DeviceArrayView<ushort4> dense_image_knn; // 有效像素对应的位置 Each depth scalar term has 4 nearest neighbour
+			DeviceArrayView<ushort2> node_graph;  // 每个节点最近的八个节点
 			//DeviceArrayView<ushort4> density_map_knn; //Each density scalar term has 4 nearest neighbour
-			DeviceArrayView<ushort4> foreground_mask_knn; //The same as density term
-			DeviceArrayView<ushort4> sparse_feature_knn; //Each 4 nodes correspond to 3 scalar cost
+			DeviceArrayView<ushort4> foreground_mask_knn; //The same as density term 前景mask区域有效的区域
+			DeviceArrayView<ushort4> sparse_feature_knn; //Each 4 nodes correspond to 3 scalar cost 光流匹配有效的区域
 		} m_term2node;
 		
 		//The term offset of term2node map
-		TermTypeOffset m_term_offset;
+		TermTypeOffset m_term_offset;  // 每个m_term2node对应的size大小，存储的是这四个数组的大小
 		unsigned m_num_nodes;
 		
 		/* The key-value buffer for indexing
 		 */
 	private:
-		DeviceBufferArray<unsigned> m_nodepair_keys;
-		DeviceBufferArray<unsigned> m_term_idx_values;
+		DeviceBufferArray<unsigned> m_nodepair_keys;  // 这里还是有点不一样的，这里保存的是成对的匹配，比如knn有四个节点，这里就从四个节点挑出来两个，小在前大在后，也就是6 1选中
+		DeviceBufferArray<unsigned> m_term_idx_values;  // 对应m_term2node中从上到小的排列
 	public:
 		void buildTermKeyValue(cudaStream_t stream = 0);
 		
@@ -86,13 +86,13 @@ namespace surfelwarp {
 		/* Perform key-value sort, do compaction
 		 */
 	private:
-		KeyValueSort<unsigned, unsigned> m_nodepair2term_sorter;
-		DeviceBufferArray<unsigned> m_segment_label;
-		PrefixSum m_segment_label_prefixsum;
+		KeyValueSort<unsigned, unsigned> m_nodepair2term_sorter;  // 按照m_nodepair_keys对所有的匹配对进行排序
+		DeviceBufferArray<unsigned> m_segment_label;  // 标记哪个是有效的，就是剔除重复的
+		PrefixSum m_segment_label_prefixsum;  // 标记的前缀和，挺有趣的，感觉这个前缀和是个万金油呀
 		
 		//The compacted half key and values
-		DeviceBufferArray<unsigned> m_half_nodepair_keys;
-		DeviceBufferArray<unsigned> m_half_nodepair2term_offset;
+		DeviceBufferArray<unsigned> m_half_nodepair_keys;  // 存储有效的nodepair2term
+		DeviceBufferArray<unsigned> m_half_nodepair2term_offset;  // 这个有效的nodepair2term在m_nodepair2term_sorter的索引
 	public:
 		void sortCompactTermIndex(cudaStream_t stream = 0);
 	

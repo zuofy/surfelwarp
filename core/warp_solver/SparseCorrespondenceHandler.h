@@ -80,7 +80,7 @@ namespace surfelwarp {
 		DeviceBufferArray<float4> m_valid_knn_weight;  // 对应的knn weight
 
 		//The page-locked memory
-		unsigned* m_correspondence_array_size;
+		unsigned* m_correspondence_array_size;  // 有多少有用的像素对是有效的
 	public:
 		void CompactQueryPixelPairs(cudaStream_t stream = 0);
 		void QueryCompactedArraySize(cudaStream_t stream = 0);

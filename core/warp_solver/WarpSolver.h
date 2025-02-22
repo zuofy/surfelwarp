@@ -169,8 +169,8 @@ namespace surfelwarp {
 		 * Depends: correspond depth, valid pixel, node graph, sparse feature
 		 */
 	private:
-		Node2TermsIndex::Ptr m_node2term_index;
-		NodePair2TermsIndex::Ptr m_nodepair2term_index;
+		Node2TermsIndex::Ptr m_node2term_index;  // 所有有效的像素对应的knn，这里不保存索引吗
+		NodePair2TermsIndex::Ptr m_nodepair2term_index;  // 和上边有点像
 		void allocateNode2TermIndexBuffer();
 		void releaseNode2TermIndexBuffer();
 	public:

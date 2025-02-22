@@ -117,7 +117,7 @@ namespace surfelwarp {
 		DeviceBufferArray<float4> m_valid_color_pixel_knn_weight, m_valid_mask_pixel_knn_weight;  // 存储的是每个有用像素对应的knn的权重，有效的像素和mask
 
 		//The pagelocked memory
-		unsigned* m_num_mask_pixel;
+		unsigned* m_num_mask_pixel;  // 有多少个mask内有用的像素
 	public:
 		void CompactValidColorPixel(cudaStream_t stream = 0);
 		void QueryCompactedColorPixelArraySize(cudaStream_t stream = 0);

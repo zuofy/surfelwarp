@@ -299,11 +299,15 @@ void surfelwarp::WarpSolver::releaseNode2TermIndexBuffer() {
 }
 
 void surfelwarp::WarpSolver::SetNode2TermIndexInput() {
+	// 存储的是每个有用像素对应的节点的索引
 	const auto dense_depth_knn = m_image_knn_fetcher->DenseImageTermKNNArray();
 	//const auto density_map_knn = m_image_knn_fetcher->DenseImageTermKNNArray();
+	// 还是空的，暂时是空的
 	const auto density_map_knn = DeviceArrayView<ushort4>(); //Empty
-	const auto node_graph = m_warpfield_input.node_graph;
+	const auto node_graph = m_warpfield_input.node_graph;  // 每个节点最近八个节点的坐标及其距离
+	// 存储的是每个有用像素对应的节点的索引，有效的像素和mask，这个是通过msk获取的
 	const auto foreground_mask_knn = m_density_foreground_handler->ForegroundMaskTermKNN();
+	// 存储的是每个有用像素对对应的knn节点的索引，这里只保存有用的，我靠，这些点可能并不对应呀，会不会出事儿呀
 	const auto sparse_feature_knn = m_sparse_correspondence_handler->SparseFeatureKNN();
 	m_node2term_index->SetInputs(
 		dense_depth_knn,
@@ -331,8 +335,9 @@ void surfelwarp::WarpSolver::BuildNode2TermIndex(cudaStream_t stream) {
 
 void surfelwarp::WarpSolver::BuildNodePair2TermIndexBlocked(cudaStream_t stream) {
 	m_nodepair2term_index->BuildHalfIndex(stream);
+	// 这个语句进行resize一下，更紧凑的表示
 	m_nodepair2term_index->QueryValidNodePairSize(stream); //This will blocked
-	
+	// 太多东西，快给我绕晕了，我蒙圈了呀
 	//The later computation depends on the size
 	m_nodepair2term_index->BuildSymmetricAndRowBlocksIndex(stream);
 	

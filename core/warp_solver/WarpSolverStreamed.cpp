@@ -79,6 +79,7 @@ void surfelwarp::WarpSolver::buildSolverIndexStreamed() {
 	//m_sparse_correspondence_handler->QueryCompactedArraySize();
 
 	//The sync group
+	// 这里是对获取的有效像素进行一个处理，并且不对
 	m_image_knn_fetcher->SyncQueryCompactedPotentialPixelSize(m_solver_stream[0]); //Sync is inside the method
 	m_density_foreground_handler->QueryCompactedMaskPixelArraySize(m_solver_stream[1]); //Sync is inside the method
 	m_sparse_correspondence_handler->QueryCompactedArraySize(m_solver_stream[2]); //Sync is inside the method
