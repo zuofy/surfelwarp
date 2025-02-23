@@ -339,6 +339,7 @@ void surfelwarp::WarpSolver::BuildNodePair2TermIndexBlocked(cudaStream_t stream)
 	m_nodepair2term_index->QueryValidNodePairSize(stream); //This will blocked
 	// 太多东西，快给我绕晕了，我蒙圈了呀
 	//The later computation depends on the size
+	// 我只能说一句我靠，机器学习没好好学，现在后悔了吧，鳖孙
 	m_nodepair2term_index->BuildSymmetricAndRowBlocksIndex(stream);
 	
 	

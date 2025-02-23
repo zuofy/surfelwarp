@@ -50,9 +50,9 @@ namespace surfelwarp { namespace device {
 		__shared__ unsigned partial_sum[32];
 
 		//The idx is in [0, 1024)
-		const auto idx = threadIdx.x + blockDim.x*blockIdx.x;
-		const auto warp_idx = idx >> 5;
-		const auto lane_idx = idx & 31;
+		const auto idx = threadIdx.x + blockDim.x*blockIdx.x;  // idx是最大的线程
+		const auto warp_idx = idx >> 5;  // 在一个block中所有的线程每32个被分为一个warp
+		const auto lane_idx = idx & 31;  // 这里就是warp内线程的编号
 		
 		unsigned bin_length = 0;
 		if (idx < valid_bin_length.Size()) {
@@ -60,8 +60,8 @@ namespace surfelwarp { namespace device {
 			//so does 32 * idx + 31 is the ending row
 			//For a matrix row, its corresponding blk-row is
 			//matrix_row / 6
-			const unsigned blkrow_begin = bin_size * idx / 6;
-			unsigned blkrow_end = (bin_size * idx + bin_size - 1) / 6;
+			const unsigned blkrow_begin = bin_size * idx / 6;  // 获取当前对应节点的索引
+			unsigned blkrow_end = (bin_size * idx + bin_size - 1) / 6;  // 获取当前节点对应结束位置的索引
 			blkrow_end = umin(blkrow_end, rowblk_length.Size() - 1);
 			unsigned max_length = 0;
 			for (unsigned blkrow_idx = blkrow_begin; blkrow_idx <= blkrow_end; blkrow_idx++) {
@@ -184,7 +184,7 @@ void surfelwarp::NodePair2TermsIndex::computeBlockRowLength(cudaStream_t stream)
 
 void surfelwarp::NodePair2TermsIndex::computeBinLength(cudaStream_t stream) {
 	//Correct the size of the matrix
-	const auto matrix_size = m_num_nodes * 6;
+	const auto matrix_size = m_num_nodes * 6;  // 为什么乘6
 	const auto num_bins = divUp(matrix_size, bin_size);
 	
 	m_binlength_array.ResizeArrayOrException(num_bins);

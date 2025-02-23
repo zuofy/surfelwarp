@@ -72,7 +72,7 @@ namespace surfelwarp {
 		
 		//The term offset of term2node map
 		TermTypeOffset m_term_offset;  // 每个m_term2node对应的size大小，存储的是这四个数组的大小
-		unsigned m_num_nodes;
+		unsigned m_num_nodes;  // 节点的数量
 		
 		/* The key-value buffer for indexing
 		 */
@@ -100,9 +100,9 @@ namespace surfelwarp {
 		/* Fill the other part of the matrix
 		 */
 	private:
-		DeviceBufferArray<unsigned> m_compacted_nodepair_keys;
-		DeviceBufferArray<uint2> m_nodepair_term_range;
-		KeyValueSort<unsigned, uint2> m_symmetric_kv_sorter;
+		DeviceBufferArray<unsigned> m_compacted_nodepair_keys;  // 这里为什么要把节点ij重新用节点ji存储一遍，是为了方便计算吗
+		DeviceBufferArray<uint2> m_nodepair_term_range;  // 把m_half_nodepair2term_offset逐一元素复制两次
+		KeyValueSort<unsigned, uint2> m_symmetric_kv_sorter;  // 把这个m_compacted_nodepair_keys拍了个序
 	public:
 		void buildSymmetricCompactedIndex(cudaStream_t stream = 0);
 		
@@ -110,7 +110,11 @@ namespace surfelwarp {
 		/* Compute the offset and length of each BLOCKED row
 		 */
 	private:
+	    // 0-10是第一个节点对应的元素，11-15是第二个节点对应的元素，数组的大小为节点的数量加1
+		// m_blkrow_offset_array其实就是存的是所有的节点，每个节点对应的范围
 		DeviceBufferArray<unsigned> m_blkrow_offset_array;
+		// 数组大小和节点数量是一样的
+		// 每个位置存每个节点对应了多少个节点对
 		DeviceBufferArray<unsigned> m_blkrow_length_array;
 		void blockRowOffsetSanityCheck();
 		void blockRowLengthSanityCheck();
@@ -121,9 +125,13 @@ namespace surfelwarp {
 		/* Compute the map from block row to the elements in this row block
 		 */
 	private:
-		DeviceBufferArray<unsigned> m_binlength_array;
-		DeviceBufferArray<unsigned> m_binnonzeros_prefixsum;
-		DeviceBufferArray<int> m_binblocked_csr_rowptr;
+		// 这里的idx是(m_num_nodes * 6) / 32，最大设置为1024，每六个节点分为一组，求每组哪个对应有最多的元素
+		// 将最多的元素的数量乘6保存到m_binlength_array中，这里是在分组吗
+		DeviceBufferArray<unsigned> m_binlength_array;  // 大小为(m_num_nodes * 6) / 32，是用于CSR列索引
+		// 我只能瞎扯了，暂时就理解为上边分组之后每组多少个元素，每组对应的非0元素数量？？？？？
+		// 这是在做压缩吗，感觉得把代码运行起来看看了
+		DeviceBufferArray<unsigned> m_binnonzeros_prefixsum; // 大小为(m_num_nodes * 6) / 32 + 1，用于CSR的行索引
+		DeviceBufferArray<int> m_binblocked_csr_rowptr;   // 说实话我真看不懂了，这里是干啥的，给我绕迷糊了
 		void binLengthNonzerosSanityCheck();
 		void binBlockCSRRowPtrSanityCheck();
 	public:
@@ -134,7 +142,7 @@ namespace surfelwarp {
 		/* Compute the column ptr for bin block csr matrix
 		 */
 	private:
-		DeviceBufferArray<int> m_binblocked_csr_colptr;
+		DeviceBufferArray<int> m_binblocked_csr_colptr;  // 去他妈的，就假如是把这些东西分了个块吧
 		void binBlockCSRColumnPtrSanityCheck();
 	public:
 		void nullifyBinBlockCSRColumePtr(cudaStream_t stream = 0);

@@ -96,8 +96,11 @@ void surfelwarp::WarpSolver::buildSolverIndexStreamed() {
 
 void surfelwarp::WarpSolver::solverIterationGlobalIterationStreamed() {
 	//Hand in the new SE3 to handlers
+	// 当前输入的节点对应的四元数
 	m_dense_depth_handler->UpdateNodeSE3(m_iteration_data.CurrentWarpFieldInput());
+	// 当前输入的节点对应的四元数
 	m_density_foreground_handler->UpdateNodeSE3(m_iteration_data.CurrentWarpFieldInput());
+	// 当前输入的节点对应的四元数
 	m_sparse_correspondence_handler->UpdateNodeSE3(m_iteration_data.CurrentWarpFieldInput());
 
 	//The computation of jacobian
