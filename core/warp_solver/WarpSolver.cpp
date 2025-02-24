@@ -271,9 +271,9 @@ void surfelwarp::WarpSolver::releaseSmoothTermHandlerBuffer() {
 void surfelwarp::WarpSolver::computeSmoothTermNode2Jacobian(cudaStream_t stream) {
 	//Prepare the input
 	m_graph_smooth_handler->SetInputs(
-		m_iteration_data.CurrentWarpFieldInput(),
-		m_warpfield_input.node_graph,
-		m_warpfield_input.reference_node_coords
+		m_iteration_data.CurrentWarpFieldInput(),  // se3
+		m_warpfield_input.node_graph,  // 相邻节点
+		m_warpfield_input.reference_node_coords  // 节点的坐标
 	);
 	
 	//Do it
@@ -366,6 +366,7 @@ void surfelwarp::WarpSolver::ComputeTermJacobiansFreeIndex(
 }
 
 //Assume the SE3 for each term expepted smooth term is updated
+// 计算Jacobian矩阵，其实就是计算损失函数关于节点的每个变量(双四元数)的一阶导数
 void surfelwarp::WarpSolver::ComputeTermJacobianFixedIndex(
 	cudaStream_t dense_depth,
 	cudaStream_t density_map,

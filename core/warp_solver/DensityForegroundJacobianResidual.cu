@@ -15,33 +15,33 @@
 namespace surfelwarp { namespace device {
 	
 	__global__ void computeDensityMapJacobian(
-		cudaTextureObject_t reference_vertex_map,
-		cudaTextureObject_t rendered_rgb_map,
+		cudaTextureObject_t reference_vertex_map,  // 参考帧顶点
+		cudaTextureObject_t rendered_rgb_map,  // 渲染rgb颜色
 		//The maps from camera observation
-		cudaTextureObject_t density_map, // float1 texture
-		cudaTextureObject_t density_gradient_map, // float2 texture
+		cudaTextureObject_t density_map, // float1 texture  // 密度图
+		cudaTextureObject_t density_gradient_map, // float2 texture  // 密度梯度图
 		unsigned width, unsigned height,
 		//The queried pxiels and their weights
-		const DeviceArrayView<ushort2> density_term_pixels,
-		const ushort4* density_term_knn,
-		const float4* density_term_knn_weight,
+		const DeviceArrayView<ushort2> density_term_pixels,  // 第几个有用像素，像素位置
+		const ushort4* density_term_knn,  // 对应的knn节点
+		const float4* density_term_knn_weight,  // 对应的knn权重
 		//The warp field information
-		const DualQuaternion* device_warp_field,
+		const DualQuaternion* device_warp_field,  // 节点双四元数
 		const Intrinsic intrinsic, const mat34 world2camera,
 		//Output
-		TwistGradientOfScalarCost* gradient,
-		float* residual_array
+		TwistGradientOfScalarCost* gradient,  // m_color_twist_gradient
+		float* residual_array  // m_color_residual
 	) {
 		const auto idx = threadIdx.x + blockDim.x * blockIdx.x;
 		if(idx >= density_term_pixels.Size()) return; //The function does not involve warp/block sync
 
 		//Prepare the data
-		const ushort2 pixel = density_term_pixels[idx];
-		const ushort4 knn = density_term_knn[idx];
-		const float4 knn_weight = density_term_knn_weight[idx];
-		const float4 reference_vertex = tex2D<float4>(reference_vertex_map, pixel.x, pixel.y);
-		const float4 rendered_rgb = tex2D<float4>(rendered_rgb_map, pixel.x, pixel.y);
-		const float geometry_density = rgb2density(rendered_rgb);
+		const ushort2 pixel = density_term_pixels[idx];  // 像素位置
+		const ushort4 knn = density_term_knn[idx];  // 对应knn
+		const float4 knn_weight = density_term_knn_weight[idx];  // 对应knn权重
+		const float4 reference_vertex = tex2D<float4>(reference_vertex_map, pixel.x, pixel.y);  // 参考帧的顶点
+		const float4 rendered_rgb = tex2D<float4>(rendered_rgb_map, pixel.x, pixel.y);  // 渲染的颜色
+		const float geometry_density = rgb2density(rendered_rgb);  // 渲染后的色彩
 		
 		//Compute the jacobian
 		TwistGradientOfScalarCost twist_graident;

@@ -132,6 +132,7 @@ namespace surfelwarp { namespace device {
 
 			//This pair is valid, compute the jacobian and residual
 			if(valid_pair) {
+				// 这个像素就是第一个损失
 				pixel_residual = dot(depth_normal, warped_vertex_camera - depth_vertex);
 				pixel_twist->translation = world2camera.rot.transpose_dot(depth_normal); // depth_world_normal
 				pixel_twist->rotation = cross(warped_vertex, pixel_twist->translation); // cross(warp_vertex, depth_world_normal)
@@ -139,8 +140,8 @@ namespace surfelwarp { namespace device {
 		} // This pixel is projected inside
 
 		//Write it to global memory
-		residual[idx] = pixel_residual;
-		twist_gradient[idx] = *pixel_twist;
+		residual[idx] = pixel_residual;  // 保存了当前的损失
+		twist_gradient[idx] = *pixel_twist;  // 保存了关于当前损失关于translation和rotation的梯度
 	}
 
 } // namespace device

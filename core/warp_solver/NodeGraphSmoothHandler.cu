@@ -72,9 +72,9 @@ void surfelwarp::NodeGraphSmoothHandler::SetInputs(
 /* The method to build the term2jacobian
  */
 void surfelwarp::NodeGraphSmoothHandler::forwardWarpSmootherNodes(cudaStream_t stream) {
-	Ti_xj_.ResizeArrayOrException(m_node_graph.Size());
-	Tj_xj_.ResizeArrayOrException(m_node_graph.Size());
-	m_pair_validity_indicator.ResizeArrayOrException(m_node_graph.Size());
+	Ti_xj_.ResizeArrayOrException(m_node_graph.Size());  // 八节点数量大小
+	Tj_xj_.ResizeArrayOrException(m_node_graph.Size());  // 八节点数量大小
+	m_pair_validity_indicator.ResizeArrayOrException(m_node_graph.Size());  // 八节点数量大小
 
 	dim3 blk(128);
 	dim3 grid(divUp(m_node_graph.Size(), blk.x));

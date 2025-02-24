@@ -128,10 +128,10 @@ namespace surfelwarp {
 		/* Compute the gradient
 		 */
 	private:
-		DeviceBufferArray<float> m_color_residual;
-		DeviceBufferArray<TwistGradientOfScalarCost> m_color_twist_gradient;
-		DeviceBufferArray<float> m_foreground_residual;
-		DeviceBufferArray<TwistGradientOfScalarCost> m_foreground_twist_gradient;
+		DeviceBufferArray<float> m_color_residual;  // 密度差异
+		DeviceBufferArray<TwistGradientOfScalarCost> m_color_twist_gradient;  // 颜色梯度？密度梯度？
+		DeviceBufferArray<float> m_foreground_residual; // 和密度计算是一样的，这里将mask作为密度
+		DeviceBufferArray<TwistGradientOfScalarCost> m_foreground_twist_gradient;  // 和密度计算是一样的，这里将mask作为密度
 		void computeDensityMapTwistGradient(cudaStream_t stream = 0);
 		void computeForegroundMaskTwistGradient(cudaStream_t stream = 0);
 	public:

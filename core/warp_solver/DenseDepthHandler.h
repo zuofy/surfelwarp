@@ -103,8 +103,8 @@ namespace surfelwarp {
 		/* Compute the twist jacobian
 		 */
 	private:
-		DeviceBufferArray<float> m_term_residual;
-		DeviceBufferArray<TwistGradientOfScalarCost> m_term_twist_gradient;
+		DeviceBufferArray<float> m_term_residual;  // 有多少个有效像素，这个就多大，关于每个像素的误差
+		DeviceBufferArray<TwistGradientOfScalarCost> m_term_twist_gradient;  // 同样的和有效像素的数量相关，关于rotation和translation的梯度
 	public:
 		void ComputeJacobianTermsFreeIndex(cudaStream_t stream = 0);
 		void ComputeJacobianTermsFixedIndex(cudaStream_t stream = 0);

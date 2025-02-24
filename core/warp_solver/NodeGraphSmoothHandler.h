@@ -17,9 +17,9 @@ namespace surfelwarp {
 	class NodeGraphSmoothHandler {
 	private:
 		//The input data from solver
-		DeviceArrayView<DualQuaternion> m_node_se3;
-		DeviceArrayView<ushort2> m_node_graph;
-		DeviceArrayView<float4> m_reference_node_coords;
+		DeviceArrayView<DualQuaternion> m_node_se3;  // se3
+		DeviceArrayView<ushort2> m_node_graph;  // 相邻八节点
+		DeviceArrayView<float4> m_reference_node_coords;  // 节点的坐标
 
 	public:
 		using Ptr = std::shared_ptr<NodeGraphSmoothHandler>;
@@ -36,9 +36,9 @@ namespace surfelwarp {
 
 		//Do a forward warp on nodes
 	private:
-		DeviceBufferArray<float3> Ti_xj_;
-		DeviceBufferArray<float3> Tj_xj_;
-		DeviceBufferArray<unsigned char> m_pair_validity_indicator;
+		DeviceBufferArray<float3> Ti_xj_;  // 公式10里的一项
+		DeviceBufferArray<float3> Tj_xj_;  // 公式10的另一项
+		DeviceBufferArray<unsigned char> m_pair_validity_indicator; // 标记该项目是否有用
 		void forwardWarpSmootherNodes(cudaStream_t stream = 0);
 	public:
 		void BuildTerm2Jacobian(cudaStream_t stream = 0);
